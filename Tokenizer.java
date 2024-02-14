@@ -13,8 +13,7 @@ public class Tokenizer{
     static String[] arrayInput;
 
     public static void main(String [] args){        
-        String input = "Transmission ( \"Program Start!\" ) ;" +
-        " Comet var1 = reception ( \"Enter A Number\" ) ;" +
+        String input = " Comet var1 = reception ( \"Enter A Number\" ) ;" +
         " Comet var2 = 10 " +
         " Whirl ( var2 <= var1 ) { " +
         "    var2 -- ; " +
@@ -30,7 +29,8 @@ public class Tokenizer{
         "    transmission ( \"Equal!\" ) ; " +
         " } " +
         " ; " +
-        " /* This is a comment */ "
+        " /* This is a comment */ " +
+        " $_ThisShouldBeInvalid " //Invalid token for testing
         ;
 
         System.out.println("=================================================");
