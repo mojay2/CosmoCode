@@ -11,3 +11,5 @@ Orbit ( result <= 15 ) { /* Checking if result is less than or equal to 15 */
 
 /* This is a comment */
 $_ThisShouldBeInvalid /* Invalid statement */
+$_ThisShouldBeInvalid /* Invalid statement */
+$_ThisShouldBeInvalid /* Invalid statement */

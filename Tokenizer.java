@@ -22,6 +22,8 @@ public class Tokenizer {
     static Set<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
     static String[] arrayInput;
     static ArrayList<String> symbolTable = new ArrayList<>();
+    static int counter = 0;
+    static int totalErrors = 0;
 
     /**
      * Main method to process input and output for multiple files.
@@ -31,7 +33,7 @@ public class Tokenizer {
     public static void main(String[] args) {
         // change value of i for different input/output files
         for (int i = 1; i <= 3; i++) {
-            processInput("CosmoCode/input/input" + i + ".txt", "CosmoCode/output/output" + i + ".txt");
+            processInput("./input/input" + i + ".txt", "./output/output" + i + ".txt");
         }
     }
 
@@ -55,6 +57,8 @@ public class Tokenizer {
         // pass to tokenizer
         String[] tokenized = tokenize(arrayInput);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
+
+        System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
 
         writeOutputToFile(outputPath, tokenized);
@@ -105,55 +109,62 @@ public class Tokenizer {
      */
     public static String[] tokenize(String[] input) {
         ArrayList<String> tokenList = new ArrayList<>();
+        counter = 0;
+        totalErrors = 0;
+
         for (int i = 0; i < input.length; i++) {
             if (input[i].equals("Comet")) { // Comet Keyword
                 tokenList.add("comet_token");
-            } else if(input[i].matches("-?\\d+")) {  // Comet
+            } else if (input[i].matches("-?\\d+")) { // Comet
                 tokenList.add("comet_" + input[i]);
-            } else if(separators.contains(input[i])) { //Separator
+            } else if (separators.contains(input[i])) { // Separator
                 tokenList.add("separator");
-            } else if(comparisonOperators.contains(input[i])) {  //Comparison Operator
+            } else if (comparisonOperators.contains(input[i])) { // Comparison Operator
                 tokenList.add("comp_oper");
-            } else if(logicalOperators.contains(input[i])) { //Logical Operator
+            } else if (logicalOperators.contains(input[i])) { // Logical Operator
                 tokenList.add("logic_oper");
-            } else if(arithmeticOperators.contains(input[i])) { // Arithmetic Operator
+            } else if (arithmeticOperators.contains(input[i])) { // Arithmetic Operator
                 tokenList.add("arithmetic_oper");
-            } else if(input[i].equals("=")) { //Assignment Operator
+            } else if (input[i].equals("=")) { // Assignment Operator
                 tokenList.add("assgnmt_oper");
-            } else if(input[i].equals("Voyage")) { //Voyage literal
+            } else if (input[i].equals("Voyage")) { // Voyage literal
                 tokenList.add("voyage_token");
-            } else if(input[i].equals("Reception")) { //Reception Literal
+            } else if (input[i].equals("Reception")) { // Reception Literal
                 tokenList.add("reception_token");
-            } else if(input[i].equals("Transmission")) { //Transmission Literal
+            } else if (input[i].equals("Transmission")) { // Transmission Literal
                 tokenList.add("transmission_token");
-            } else if(input[i].equals("Whirl")) { // Whirl
+            } else if (input[i].equals("Whirl")) { // Whirl
                 tokenList.add("whirl_lit");
-            } else if(input[i].equals("LaunchWhirl")) { //LaunchWhirl
+            } else if (input[i].equals("LaunchWhirl")) { // LaunchWhirl
                 tokenList.add("launchwhirl_token");
-            } else if(input[i].equals("Orbit")) {  //Orbit
+            } else if (input[i].equals("Orbit")) { // Orbit
                 tokenList.add("orbit_token");
-            } else if(input[i].equals("Navigate")) { //Navigate
+            } else if (input[i].equals("Navigate")) { // Navigate
                 tokenList.add("navigate_token");
-            } else if(input[i].equals("Propel")) { //Propel
+            } else if (input[i].equals("Propel")) { // Propel
                 tokenList.add("propel_token");
-            } else if (input[i].matches("[a-zA-Z0-9_]+")) { //Indentifier / ?Variable?
-                if (input[i].length() == 1){
+            } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
+                if (input[i].length() == 1) {
                     tokenList.add("id_" + input[i]);
-                    if(symbolTable.contains(input[i]))
+                    if (symbolTable.contains(input[i]))
                         symbolTable.add("id_" + input[i]);
                 } else {
                     tokenList.add("id_" + input[i]);
                     symbolTable.add("id_" + input[i]);
                 }
-            } else if(input[i].matches(whiteSpace)){ //White Space
-            } else if(input[i].startsWith("\"")){ //String
-                for(; !input[i].endsWith("\"") ;i++);
+            } else if (input[i].matches(whiteSpace)) { // White Space
+            } else if (input[i].startsWith("\"")) { // String
+                for (; !input[i].endsWith("\""); i++)
+                    ;
                 tokenList.add("string");
-            } else if(input[i].startsWith("/*")){  //Comment
-                for(; !input[i].endsWith("*/") ;i++);
-                tokenList.add("comment");
-            }else { // Add more cases here
-                tokenList.add("invalid_token");
+            } else if (input[i].startsWith("/*")) { // Comment
+                for (; !input[i].endsWith("*/"); i++)
+                    ;
+                // tokenList.add("comment");
+            } else { // Add more cases here
+                counter++;
+                tokenList.add("invalid_token_" + counter);
+                totalErrors++;
             }
         }
         return tokenList.toArray(new String[0]);

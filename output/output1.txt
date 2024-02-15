@@ -74,5 +74,4 @@ separator
 separator
 separator
 separator
-comment
-invalid_token
+invalid_token_1
