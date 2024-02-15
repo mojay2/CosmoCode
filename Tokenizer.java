@@ -13,12 +13,13 @@ import java.util.*;
  */
 public class Tokenizer {
 
-    // Regular expressions and sets for the various token types
+    // Regular expressions, Maps and sets for the various token types
     static String whiteSpace = "(([\\s] *) | ((?s). *[\\n\\r].) *)";
-    static Set<String> separators = new HashSet<>(Arrays.asList("(", ")", "{", "}", ",", ";"));
-    static Set<String> comparisonOperators = new HashSet<>(Arrays.asList("==", ">=", "<=", "!=", ">", "<"));
-    static Set<String> logicalOperators = new HashSet<>(Arrays.asList("&&", "||"));
-    static Set<String> arithmeticOperators = new HashSet<>(Arrays.asList("+", "-", "*", "/", "++", "--"));
+    static Map<String, String> symbolTableMap = createSymbolTableMap();
+    static Map<String, String> separatorMap = createSeparatorMap();
+    static Map<String, String> comparisonMap = createComparisonMap();
+    static Map<String, String> logicalOperatorMap = createLogicalMap();
+    static Map<String, String> arithmeticOperatorMap = createArithmeticMap();
     static Set<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
     static String[] arrayInput;
     static ArrayList<String> symbolTable = new ArrayList<>();
@@ -60,7 +61,6 @@ public class Tokenizer {
 
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
-
         writeOutputToFile(outputPath, tokenized);
     }
 
@@ -113,44 +113,24 @@ public class Tokenizer {
         totalErrors = 0;
 
         for (int i = 0; i < input.length; i++) {
-            if (input[i].equals("Comet")) { // Comet Keyword
-                tokenList.add("comet_token");
+            if (symbolTableMap.containsKey(input[i])) { // Keyword 
+                tokenList.add(symbolTableMap.get(input[i]));
             } else if (input[i].matches("-?\\d+")) { // Comet
                 tokenList.add("comet_" + input[i]);
-            } else if (separators.contains(input[i])) { // Separator
-                tokenList.add("separator");
-            } else if (comparisonOperators.contains(input[i])) { // Comparison Operator
-                tokenList.add("comp_oper");
-            } else if (logicalOperators.contains(input[i])) { // Logical Operator
-                tokenList.add("logic_oper");
-            } else if (arithmeticOperators.contains(input[i])) { // Arithmetic Operator
-                tokenList.add("arithmetic_oper");
+            } else if (separatorMap.containsKey(input[i])) { // Separator
+                tokenList.add("sep_" + separatorMap.get(input[i]));
+            } else if (comparisonMap.containsKey(input[i])) { // Comparison Operator
+                tokenList.add("comp_" + comparisonMap.get(input[i]));
+            } else if (logicalOperatorMap.containsKey(input[i])) { // Logical Operator
+                tokenList.add("logic_" + logicalOperatorMap.get(input[i]));
+            } else if (arithmeticOperatorMap.containsKey(input[i])) { // Arithmetic Operator
+                tokenList.add("arith_" + arithmeticOperatorMap.get(input[i]));
             } else if (input[i].equals("=")) { // Assignment Operator
                 tokenList.add("assgnmt_oper");
-            } else if (input[i].equals("Voyage")) { // Voyage literal
-                tokenList.add("voyage_token");
-            } else if (input[i].equals("Reception")) { // Reception Literal
-                tokenList.add("reception_token");
-            } else if (input[i].equals("Transmission")) { // Transmission Literal
-                tokenList.add("transmission_token");
-            } else if (input[i].equals("Whirl")) { // Whirl
-                tokenList.add("whirl_lit");
-            } else if (input[i].equals("LaunchWhirl")) { // LaunchWhirl
-                tokenList.add("launchwhirl_token");
-            } else if (input[i].equals("Orbit")) { // Orbit
-                tokenList.add("orbit_token");
-            } else if (input[i].equals("Navigate")) { // Navigate
-                tokenList.add("navigate_token");
-            } else if (input[i].equals("Propel")) { // Propel
-                tokenList.add("propel_token");
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
-                if (input[i].length() == 1) {
-                    tokenList.add("id_" + input[i]);
-                    if (symbolTable.contains(input[i]))
-                        symbolTable.add("id_" + input[i]);
-                } else {
-                    tokenList.add("id_" + input[i]);
-                    symbolTable.add("id_" + input[i]);
+                tokenList.add("id_" + input[i]);
+                if (symbolTableMap.containsKey(input[i])){
+                    symbolTableMap.put(input[i], "id_"+ input[i]);
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space
             } else if (input[i].startsWith("\"")) { // String
@@ -169,4 +149,59 @@ public class Tokenizer {
         }
         return tokenList.toArray(new String[0]);
     }
+
+    private static Map<String, String> createSeparatorMap() {
+        return Map.ofEntries(
+                Map.entry("(", "op_par"),
+                Map.entry(")", "cl_par"),
+                Map.entry("{", "op_brac"),
+                Map.entry("}", "cl_brac"),
+                Map.entry(",", "comma"),
+                Map.entry(";", "semicolon")
+        );
+    }
+
+    private static Map<String, String> createLogicalMap() {
+        return Map.ofEntries(
+                Map.entry("&&", "and"),
+                Map.entry("||", "or")
+        );
+    }
+
+    private static Map<String, String> createArithmeticMap() {
+        return Map.ofEntries(
+            Map.entry("+", "plus"),
+            Map.entry("-", "minus"),
+            Map.entry("*", "mult"),
+            Map.entry("/", "div"),
+            Map.entry("++", "incr"),
+            Map.entry("--", "decr")
+        );
+    }
+
+    private static Map<String, String> createComparisonMap() {
+        return Map.ofEntries(
+            Map.entry("==", "eq"),
+            Map.entry(">=", "great_eq"),
+            Map.entry("<=", "less_eq"),
+            Map.entry("!=", "not"),
+            Map.entry(">", "great"),
+            Map.entry("<", "less")
+        );
+    }
+
+    private static Map<String, String> createSymbolTableMap() {
+        return Map.ofEntries(
+            Map.entry("Comet", "comet_token"),
+            Map.entry("Voyage", "voyage_token"),
+            Map.entry("Reception", "recep_token"),
+            Map.entry("Transmission", "trans_token"),
+            Map.entry("Whirl", "whirl_token"),
+            Map.entry("LaunchWhirl", "launchwhirl_token"),
+            Map.entry("Orbit", "orbit_token"),
+            Map.entry("Navigate", "nav_token"),
+            Map.entry("Propel", "prop_token")
+        );
+    }
 }
+
