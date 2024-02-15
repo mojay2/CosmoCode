@@ -29,7 +29,7 @@ public class Tokenizer {
      */
     public static void main(String[] args) {
         // change value of i for different input/output files
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= 3; i++) {
             processInput("input/input" + i + ".txt", "output/output" + i + ".txt");
         }
     }
