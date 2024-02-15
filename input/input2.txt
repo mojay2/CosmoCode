@@ -1,0 +1,18 @@
+Comet var1 = reception ( "Enter A Number" ) ;
+Comet var2 = 10
+Whirl ( var2 <= var1 ) {
+    var2 -- ;
+} ;
+Launch {
+    var2 -- ;
+} whirl ( var2 != 0 || var2 != 5 ) ;
+Orbit ( var1 > var2 ) {
+    transmission ( "Greater!" ) ;
+} Navigate ( var1 < var2 ) {
+    transmission ( "Lesser!" ) ;
+} Propel {
+    transmission ( "Equal!" ) ;
+}
+;
+/* This is a comment */
+$_ThisShouldBeInvalid
