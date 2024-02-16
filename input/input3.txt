@@ -5,11 +5,12 @@ Comet result = x + y ; /* Computing the sum of x and y and assigning it to resul
 Orbit ( result <= 15 ) { /* Checking if result is less than or equal to 15 */
     transmission ( "Result is less than or equal to 15" ) ; /* Outputting message */
 } Propel { /* Else block */
+    $_ThisShouldBeInvalid /* Invalid statement */
     transmission ( "Result is greater than 15" ) ; /* Outputting message */
 }
 ;
 
 /* This is a comment */
-$_ThisShouldBeInvalid /* Invalid statement */
+
 $_ThisShouldBeInvalid /* Invalid statement */
 $_ThisShouldBeInvalid /* Invalid statement */

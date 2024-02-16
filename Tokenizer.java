@@ -134,9 +134,11 @@ public class Tokenizer {
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space
             } else if (input[i].startsWith("\"")) { // String
-                for (; !input[i].endsWith("\""); i++)
-                    ;
-                tokenList.add("string");
+                String stringConst = "";
+                for (; !input[i].endsWith("\""); i++){
+                    stringConst = stringConst + input[i] + " ";
+                }
+                tokenList.add(stringConst + input[i]);
             } else if (input[i].startsWith("/*")) { // Comment
                 for (; !input[i].endsWith("*/"); i++)
                     ;

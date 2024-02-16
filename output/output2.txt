@@ -24,7 +24,7 @@ sep_cl_par
 sep_op_brac
 id_transmission
 sep_op_par
-string
+"Result is less than or equal to 15"
 sep_cl_par
 sep_semicolon
 sep_cl_brac
@@ -32,7 +32,7 @@ prop_token
 sep_op_brac
 id_transmission
 sep_op_par
-string
+"Result is greater than 15"
 sep_cl_par
 sep_semicolon
 sep_cl_brac

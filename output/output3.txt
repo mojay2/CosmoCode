@@ -24,19 +24,19 @@ sep_cl_par
 sep_op_brac
 id_transmission
 sep_op_par
-string
+"Result is less than or equal to 15"
 sep_cl_par
 sep_semicolon
 sep_cl_brac
 prop_token
 sep_op_brac
+invalid_token_1
 id_transmission
 sep_op_par
-string
+"Result is greater than 15"
 sep_cl_par
 sep_semicolon
 sep_cl_brac
 sep_semicolon
-invalid_token_1
 invalid_token_2
 invalid_token_3
