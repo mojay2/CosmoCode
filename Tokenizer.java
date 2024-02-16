@@ -201,8 +201,8 @@ public class Tokenizer {
         return Map.ofEntries(
             Map.entry("Comet", "comet_token"),
             Map.entry("Voyage", "voyage_token"),
-            Map.entry("Reception", "reception_token"),
-            Map.entry("Transmission", "transmission_token"),
+            Map.entry("reception", "reception_token"),
+            Map.entry("transmission", "transmission_token"),
             Map.entry("Whirl", "whirl_token"),
             Map.entry("LaunchWhirl", "launchwhirl_token"),
             Map.entry("Orbit", "orbit_token"),
