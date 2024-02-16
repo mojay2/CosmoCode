@@ -28,7 +28,7 @@ sep_op_par
 sep_cl_par
 sep_semicolon
 sep_cl_brac
-prop_token
+propel_token
 sep_op_brac
 invalid_token_1
 id_transmission

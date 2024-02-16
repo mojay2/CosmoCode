@@ -32,6 +32,7 @@ public class Tokenizer {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
+        populateSymbols();
         // change value of i for different input/output files
         for (int i = 1; i <= 3; i++) {
             processInput("./input/input" + i + ".txt", "./output/output" + i + ".txt");
@@ -58,10 +59,12 @@ public class Tokenizer {
         // pass to tokenizer
         String[] tokenized = tokenize(arrayInput);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
-
+        System.out.println("\nSymbol Table:\n");
+        System.out.println(symbolTable);
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
+
     }
 
     /**
@@ -129,8 +132,10 @@ public class Tokenizer {
                 tokenList.add("assgnmt_oper");
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
                 tokenList.add("id_" + input[i]);
-                if (symbolTableMap.containsKey(input[i])){
-                    symbolTableMap.put(input[i], "id_"+ input[i]);
+                if (!symbolTable.contains(input[i])){
+                    // symbolTableMap.put(input[i], "id_"+ input[i]);
+                    // System.out.println(input[i]);
+                    symbolTable.add(input[i]);
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space
             } else if (input[i].startsWith("\"")) { // String
@@ -196,14 +201,32 @@ public class Tokenizer {
         return Map.ofEntries(
             Map.entry("Comet", "comet_token"),
             Map.entry("Voyage", "voyage_token"),
-            Map.entry("Reception", "recep_token"),
-            Map.entry("Transmission", "trans_token"),
+            Map.entry("Reception", "reception_token"),
+            Map.entry("Transmission", "transmission_token"),
             Map.entry("Whirl", "whirl_token"),
             Map.entry("LaunchWhirl", "launchwhirl_token"),
             Map.entry("Orbit", "orbit_token"),
-            Map.entry("Navigate", "nav_token"),
-            Map.entry("Propel", "prop_token")
+            Map.entry("Navigate", "navigate_token"),
+            Map.entry("Propel", "propel_token")
         );
+    }
+
+    private static void populateSymbols() { 
+        for (String value : separatorMap.values()) {
+            symbolTable.add(value);
+        }
+        for (String value : logicalOperatorMap.values()) {
+            symbolTable.add(value);
+        }
+        for (String value : arithmeticOperatorMap.values()) {
+            symbolTable.add(value);
+        }
+        for (String value : comparisonMap.values()) {
+            symbolTable.add(value);
+        }
+        for (String value : symbolTableMap.values()) {
+            symbolTable.add(value);
+        }
     }
 }
 
