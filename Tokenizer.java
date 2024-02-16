@@ -32,7 +32,6 @@ public class Tokenizer {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
-        populateSymbols();
         // change value of i for different input/output files
         for (int i = 1; i <= 3; i++) {
             processInput("./input/input" + i + ".txt", "./output/output" + i + ".txt");
@@ -114,6 +113,9 @@ public class Tokenizer {
         ArrayList<String> tokenList = new ArrayList<>();
         counter = 0;
         totalErrors = 0;
+        symbolTable = new ArrayList();
+        populateSymbols();
+
 
         for (int i = 0; i < input.length; i++) {
             if (symbolTableMap.containsKey(input[i])) { // Keyword 
@@ -133,8 +135,6 @@ public class Tokenizer {
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
                 tokenList.add("id_" + input[i]);
                 if (!symbolTable.contains(input[i])){
-                    // symbolTableMap.put(input[i], "id_"+ input[i]);
-                    // System.out.println(input[i]);
                     symbolTable.add(input[i]);
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space

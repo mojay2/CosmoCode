@@ -76,8 +76,3 @@ sep_semicolon
 sep_cl_brac
 sep_semicolon
 invalid_token_2
-id_transmission
-sep_op_par
-"Hello World"
-sep_cl_par
-sep_semicolon
