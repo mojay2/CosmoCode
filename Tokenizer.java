@@ -15,14 +15,15 @@ public class Tokenizer {
 
     // Regular expressions, Maps and sets for the various token types
     static String whiteSpace = "(([\\s] *) | ((?s). *[\\n\\r].) *)";
-    static Map<String, String> symbolTableMap = createSymbolTableMap();
-    static Map<String, String> separatorMap = createSeparatorMap();
-    static Map<String, String> comparisonMap = createComparisonMap();
-    static Map<String, String> logicalOperatorMap = createLogicalMap();
-    static Map<String, String> arithmeticOperatorMap = createArithmeticMap();
-    static Set<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
+    static HashMap<String, String> reservedWordsMap = createReservedWordsMap();
+    static HashMap<String, String> separatorMap = createSeparatorMap();
+    static HashMap<String, String> comparisonMap = createComparisonMap();
+    static HashMap<String, String> logicalOperatorMap = createLogicalMap();
+    static HashMap<String, String> arithmeticOperatorMap = createArithmeticMap();
+    static HashMap<String, String> symbolTableMap = createSymbolTableMap();
+
+    static HashSet<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
     static String[] arrayInput;
-    static ArrayList<String> symbolTable = new ArrayList<>();
     static int counter = 0;
     static int totalErrors = 0;
 
@@ -59,7 +60,7 @@ public class Tokenizer {
         String[] tokenized = tokenize(arrayInput);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
         System.out.println("\nSymbol Table:\n");
-        System.out.println(symbolTable);
+        System.out.println(symbolTableMap.values());
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
@@ -113,13 +114,10 @@ public class Tokenizer {
         ArrayList<String> tokenList = new ArrayList<>();
         counter = 0;
         totalErrors = 0;
-        symbolTable = new ArrayList();
-        populateSymbols();
-
 
         for (int i = 0; i < input.length; i++) {
-            if (symbolTableMap.containsKey(input[i])) { // Keyword 
-                tokenList.add(symbolTableMap.get(input[i]));
+            if (reservedWordsMap.containsKey(input[i])) { // Keyword 
+                tokenList.add(reservedWordsMap.get(input[i]));
             } else if (input[i].matches("-?\\d+")) { // Comet
                 tokenList.add("comet_" + input[i]);
             } else if (separatorMap.containsKey(input[i])) { // Separator
@@ -130,12 +128,10 @@ public class Tokenizer {
                 tokenList.add("logic_" + logicalOperatorMap.get(input[i]));
             } else if (arithmeticOperatorMap.containsKey(input[i])) { // Arithmetic Operator
                 tokenList.add("arith_" + arithmeticOperatorMap.get(input[i]));
-            } else if (input[i].equals("=")) { // Assignment Operator
-                tokenList.add("assgnmt_oper");
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
-                tokenList.add("id_" + input[i]);
-                if (!symbolTable.contains(input[i])){
-                    symbolTable.add(input[i]);
+                tokenList.add("id_" + input[i]);       
+                if (!symbolTableMap.containsKey(input[i])){
+                    symbolTableMap.put(input[i], "id_"+input[i]);
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space
             } else if (input[i].startsWith("\"")) { // String
@@ -156,77 +152,70 @@ public class Tokenizer {
         }
         return tokenList.toArray(new String[0]);
     }
-
-    private static Map<String, String> createSeparatorMap() {
-        return Map.ofEntries(
-                Map.entry("(", "op_par"),
-                Map.entry(")", "cl_par"),
-                Map.entry("{", "op_brac"),
-                Map.entry("}", "cl_brac"),
-                Map.entry(",", "comma"),
-                Map.entry(";", "semicolon")
-        );
+    
+    private static HashMap<String, String> createSeparatorMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("(", "op_par");
+        map.put(")", "cl_par");
+        map.put("{", "op_brac");
+        map.put("}", "cl_brac");
+        map.put(",", "comma");
+        map.put(";", "semicolon");
+        return map;
     }
 
-    private static Map<String, String> createLogicalMap() {
-        return Map.ofEntries(
-                Map.entry("&&", "and"),
-                Map.entry("||", "or")
-        );
+    private static HashMap<String, String> createLogicalMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("&&", "and");
+        map.put("||", "or");
+        return map;
     }
 
-    private static Map<String, String> createArithmeticMap() {
-        return Map.ofEntries(
-            Map.entry("+", "plus"),
-            Map.entry("-", "minus"),
-            Map.entry("*", "mult"),
-            Map.entry("/", "div"),
-            Map.entry("++", "incr"),
-            Map.entry("--", "decr")
-        );
+    private static HashMap<String, String> createArithmeticMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("+", "plus");
+        map.put("-", "minus");
+        map.put("*", "mult");
+        map.put("/", "div");
+        map.put("++", "incr");
+        map.put("--", "decr");
+        map.put("=", "assign");
+        return map;
     }
 
-    private static Map<String, String> createComparisonMap() {
-        return Map.ofEntries(
-            Map.entry("==", "eq"),
-            Map.entry(">=", "great_eq"),
-            Map.entry("<=", "less_eq"),
-            Map.entry("!=", "not"),
-            Map.entry(">", "great"),
-            Map.entry("<", "less")
-        );
+    private static HashMap<String, String> createComparisonMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("==", "eq");
+        map.put(">=", "great_eq");
+        map.put("<=", "less_eq");
+        map.put("!=", "not");
+        map.put(">", "great");
+        map.put("<", "less");
+        return map;
     }
 
-    private static Map<String, String> createSymbolTableMap() {
-        return Map.ofEntries(
-            Map.entry("Comet", "comet_token"),
-            Map.entry("Voyage", "voyage_token"),
-            Map.entry("reception", "reception_token"),
-            Map.entry("transmission", "transmission_token"),
-            Map.entry("Whirl", "whirl_token"),
-            Map.entry("LaunchWhirl", "launchwhirl_token"),
-            Map.entry("Orbit", "orbit_token"),
-            Map.entry("Navigate", "navigate_token"),
-            Map.entry("Propel", "propel_token")
-        );
+    private static HashMap<String, String> createReservedWordsMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("Comet", "comet_token");
+        map.put("Voyage", "voyage_token");
+        map.put("reception", "reception_token");
+        map.put("transmission", "transmission_token");
+        map.put("Whirl", "whirl_token");
+        map.put("Launch", "launchwhirl_token");
+        map.put("Orbit", "orbit_token");
+        map.put("Navigate", "navigate_token");
+        map.put("Propel", "propel_token");
+        return map;
     }
 
-    private static void populateSymbols() { 
-        for (String value : separatorMap.values()) {
-            symbolTable.add(value);
-        }
-        for (String value : logicalOperatorMap.values()) {
-            symbolTable.add(value);
-        }
-        for (String value : arithmeticOperatorMap.values()) {
-            symbolTable.add(value);
-        }
-        for (String value : comparisonMap.values()) {
-            symbolTable.add(value);
-        }
-        for (String value : symbolTableMap.values()) {
-            symbolTable.add(value);
-        }
+    private static HashMap<String, String> createSymbolTableMap(){
+        HashMap<String, String> map = new HashMap<>();
+        map.putAll(separatorMap);
+        map.putAll(logicalOperatorMap);
+        map.putAll(arithmeticOperatorMap);
+        map.putAll(comparisonMap);
+        map.putAll(reservedWordsMap);
+        return map;
     }
 }
 

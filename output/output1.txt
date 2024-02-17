@@ -1,14 +1,14 @@
 comet_token
 id_var1
-assgnmt_oper
-id_reception
+arith_assign
+reception_token
 sep_op_par
 "Enter A Number"
 sep_cl_par
 sep_semicolon
 comet_token
 id_var2
-assgnmt_oper
+arith_assign
 comet_10
 whirl_token
 sep_op_par
@@ -22,7 +22,7 @@ arith_decr
 sep_semicolon
 sep_cl_brac
 sep_semicolon
-id_Launch
+launchwhirl_token
 sep_op_brac
 id_var2
 arith_decr
@@ -47,7 +47,7 @@ id_var2
 sep_cl_par
 sep_op_brac
 invalid_token_1
-id_transmission
+transmission_token
 sep_op_par
 "Greater!"
 sep_cl_par
@@ -60,7 +60,7 @@ comp_less
 id_var2
 sep_cl_par
 sep_op_brac
-id_transmission
+transmission_token
 sep_op_par
 "Lesser!"
 sep_cl_par
@@ -68,7 +68,7 @@ sep_semicolon
 sep_cl_brac
 propel_token
 sep_op_brac
-id_transmission
+transmission_token
 sep_op_par
 "Equal!"
 sep_cl_par

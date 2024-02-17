@@ -1,16 +1,16 @@
 comet_token
 id_x
-assgnmt_oper
+arith_assign
 comet_5
 sep_semicolon
 comet_token
 id_y
-assgnmt_oper
+arith_assign
 comet_10
 sep_semicolon
 comet_token
 id_result
-assgnmt_oper
+arith_assign
 id_x
 arith_plus
 id_y
@@ -22,7 +22,7 @@ comp_less_eq
 comet_15
 sep_cl_par
 sep_op_brac
-id_transmission
+transmission_token
 sep_op_par
 "Result is less than or equal to 15"
 sep_cl_par
@@ -30,7 +30,7 @@ sep_semicolon
 sep_cl_brac
 propel_token
 sep_op_brac
-id_transmission
+transmission_token
 sep_op_par
 "Result is greater than 15"
 sep_cl_par
