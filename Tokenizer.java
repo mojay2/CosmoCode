@@ -60,7 +60,7 @@ public class Tokenizer {
         String[] tokenized = tokenize(arrayInput);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
         System.out.println("\nSymbol Table:\n");
-        System.out.println(symbolTableMap.values());
+        System.out.println(formatMap(symbolTableMap));
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
@@ -129,6 +129,11 @@ public class Tokenizer {
             } else if (arithmeticOperatorMap.containsKey(input[i])) { // Arithmetic Operator
                 tokenList.add("arith_" + arithmeticOperatorMap.get(input[i]));
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
+                if(isReservedWord(input[i])){
+                    counter++;
+                    tokenList.add("invalid_token_" + counter);
+                    totalErrors++;
+                }
                 tokenList.add("id_" + input[i]);       
                 if (!symbolTableMap.containsKey(input[i])){
                     symbolTableMap.put(input[i], "id_"+input[i]);
@@ -152,7 +157,7 @@ public class Tokenizer {
         }
         return tokenList.toArray(new String[0]);
     }
-    
+
     private static HashMap<String, String> createSeparatorMap() {
         HashMap<String, String> map = new HashMap<>();
         map.put("(", "op_par");
@@ -216,6 +221,58 @@ public class Tokenizer {
         map.putAll(comparisonMap);
         map.putAll(reservedWordsMap);
         return map;
+    }
+
+    
+    /**
+     * Formats a map into a string with key-value pairs.
+     * @param map The input map to format.
+     * @return Formatted string with key-value pairs.
+     */
+    private static String formatMap(Map<String, String> map) {
+        StringBuilder formattedOutput = new StringBuilder();
+        
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            formattedOutput.append(entry.getKey())
+                            .append(" : ")
+                            .append(entry.getValue())
+                            .append(" , ");
+        }
+
+        // Remove the trailing comma and space
+        if (formattedOutput.length() > 2) {
+            formattedOutput.setLength(formattedOutput.length() - 2);
+        }
+
+        return formattedOutput.toString();
+    }
+
+    /**
+     * Checks if a given string is a reserved word in the language.
+     * @param string The input string to check.
+     * @return true if the string is a reserved word, false otherwise.
+     */
+    private static Boolean isReservedWord(String string){
+        List<String> keysList = getKeysList(reservedWordsMap);
+        for (int i = 0; i < keysList.size(); i++) {
+            keysList.set(i, keysList.get(i).toLowerCase());
+        }
+        return keysList.contains(string);
+    }
+
+    /**
+     * Returns a list of keys from a given map.
+     * @param map The map to get the keys from.
+     * @return List of Keys.
+     */
+    private static List<String> getKeysList(Map<String, String> map) {
+        List<String> keysList = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            keysList.add(entry.getKey());
+        }
+
+        return keysList;
     }
 }
 
