@@ -13,15 +13,17 @@ import java.util.*;
  */
 public class Tokenizer {
 
-    // Regular expressions and sets for the various token types
+    // Regular expressions, Maps and sets for the various token types
     static String whiteSpace = "(([\\s] *) | ((?s). *[\\n\\r].) *)";
-    static Set<String> separators = new HashSet<>(Arrays.asList("(", ")", "{", "}", ",", ";"));
-    static Set<String> comparisonOperators = new HashSet<>(Arrays.asList("==", ">=", "<=", "!=", ">", "<"));
-    static Set<String> logicalOperators = new HashSet<>(Arrays.asList("&&", "||"));
-    static Set<String> arithmeticOperators = new HashSet<>(Arrays.asList("+", "-", "*", "/", "++", "--"));
-    static Set<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
+    static HashMap<String, String> reservedWordsMap = createReservedWordsMap();
+    static HashMap<String, String> separatorMap = createSeparatorMap();
+    static HashMap<String, String> comparisonMap = createComparisonMap();
+    static HashMap<String, String> logicalOperatorMap = createLogicalMap();
+    static HashMap<String, String> arithmeticOperatorMap = createArithmeticMap();
+    static HashMap<String, String> symbolTableMap = createSymbolTableMap();
+
+    static HashSet<String> commentIndicators = new HashSet<>(Arrays.asList("/*", "*/"));
     static String[] arrayInput;
-    static ArrayList<String> symbolTable = new ArrayList<>();
     static int counter = 0;
     static int totalErrors = 0;
 
@@ -57,11 +59,12 @@ public class Tokenizer {
         // pass to tokenizer
         String[] tokenized = tokenize(arrayInput);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
-
+        System.out.println("\nSymbol Table:\n");
+        System.out.println(formatMap(symbolTableMap));
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
-
         writeOutputToFile(outputPath, tokenized);
+
     }
 
     /**
@@ -113,50 +116,35 @@ public class Tokenizer {
         totalErrors = 0;
 
         for (int i = 0; i < input.length; i++) {
-            if (input[i].equals("Comet")) { // Comet Keyword
-                tokenList.add("comet_token");
+            if (reservedWordsMap.containsKey(input[i])) { // Keyword 
+                tokenList.add(reservedWordsMap.get(input[i]));
             } else if (input[i].matches("-?\\d+")) { // Comet
                 tokenList.add("comet_" + input[i]);
-            } else if (separators.contains(input[i])) { // Separator
-                tokenList.add("separator");
-            } else if (comparisonOperators.contains(input[i])) { // Comparison Operator
-                tokenList.add("comp_oper");
-            } else if (logicalOperators.contains(input[i])) { // Logical Operator
-                tokenList.add("logic_oper");
-            } else if (arithmeticOperators.contains(input[i])) { // Arithmetic Operator
-                tokenList.add("arithmetic_oper");
-            } else if (input[i].equals("=")) { // Assignment Operator
-                tokenList.add("assgnmt_oper");
-            } else if (input[i].equals("Voyage")) { // Voyage literal
-                tokenList.add("voyage_token");
-            } else if (input[i].equals("Reception")) { // Reception Literal
-                tokenList.add("reception_token");
-            } else if (input[i].equals("Transmission")) { // Transmission Literal
-                tokenList.add("transmission_token");
-            } else if (input[i].equals("Whirl")) { // Whirl
-                tokenList.add("whirl_lit");
-            } else if (input[i].equals("LaunchWhirl")) { // LaunchWhirl
-                tokenList.add("launchwhirl_token");
-            } else if (input[i].equals("Orbit")) { // Orbit
-                tokenList.add("orbit_token");
-            } else if (input[i].equals("Navigate")) { // Navigate
-                tokenList.add("navigate_token");
-            } else if (input[i].equals("Propel")) { // Propel
-                tokenList.add("propel_token");
+            } else if (separatorMap.containsKey(input[i])) { // Separator
+                tokenList.add("sep_" + separatorMap.get(input[i]));
+            } else if (comparisonMap.containsKey(input[i])) { // Comparison Operator
+                tokenList.add("comp_" + comparisonMap.get(input[i]));
+            } else if (logicalOperatorMap.containsKey(input[i])) { // Logical Operator
+                tokenList.add("logic_" + logicalOperatorMap.get(input[i]));
+            } else if (arithmeticOperatorMap.containsKey(input[i])) { // Arithmetic Operator
+                tokenList.add("arith_" + arithmeticOperatorMap.get(input[i]));
             } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Indentifier / ?Variable?
-                if (input[i].length() == 1) {
-                    tokenList.add("id_" + input[i]);
-                    if (symbolTable.contains(input[i]))
-                        symbolTable.add("id_" + input[i]);
-                } else {
-                    tokenList.add("id_" + input[i]);
-                    symbolTable.add("id_" + input[i]);
+                if(isReservedWord(input[i])){
+                    counter++;
+                    tokenList.add("invalid_token_" + counter);
+                    totalErrors++;
+                }
+                tokenList.add("id_" + input[i]);       
+                if (!symbolTableMap.containsKey(input[i])){
+                    symbolTableMap.put(input[i], "id_"+input[i]);
                 }
             } else if (input[i].matches(whiteSpace)) { // White Space
             } else if (input[i].startsWith("\"")) { // String
-                for (; !input[i].endsWith("\""); i++)
-                    ;
-                tokenList.add("string");
+                String stringConst = "";
+                for (; !input[i].endsWith("\""); i++){
+                    stringConst = stringConst + input[i] + " ";
+                }
+                tokenList.add(stringConst + input[i]);
             } else if (input[i].startsWith("/*")) { // Comment
                 for (; !input[i].endsWith("*/"); i++)
                     ;
@@ -169,4 +157,122 @@ public class Tokenizer {
         }
         return tokenList.toArray(new String[0]);
     }
+
+    private static HashMap<String, String> createSeparatorMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("(", "op_par");
+        map.put(")", "cl_par");
+        map.put("{", "op_brac");
+        map.put("}", "cl_brac");
+        map.put(",", "comma");
+        map.put(";", "semicolon");
+        return map;
+    }
+
+    private static HashMap<String, String> createLogicalMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("&&", "and");
+        map.put("||", "or");
+        return map;
+    }
+
+    private static HashMap<String, String> createArithmeticMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("+", "plus");
+        map.put("-", "minus");
+        map.put("*", "mult");
+        map.put("/", "div");
+        map.put("++", "incr");
+        map.put("--", "decr");
+        map.put("=", "assign");
+        return map;
+    }
+
+    private static HashMap<String, String> createComparisonMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("==", "eq");
+        map.put(">=", "great_eq");
+        map.put("<=", "less_eq");
+        map.put("!=", "not");
+        map.put(">", "great");
+        map.put("<", "less");
+        return map;
+    }
+
+    private static HashMap<String, String> createReservedWordsMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("Comet", "comet_token");
+        map.put("Voyage", "voyage_token");
+        map.put("reception", "reception_token");
+        map.put("transmission", "transmission_token");
+        map.put("Whirl", "whirl_token");
+        map.put("Launch", "launchwhirl_token");
+        map.put("Orbit", "orbit_token");
+        map.put("Navigate", "navigate_token");
+        map.put("Propel", "propel_token");
+        return map;
+    }
+
+    private static HashMap<String, String> createSymbolTableMap(){
+        HashMap<String, String> map = new HashMap<>();
+        map.putAll(separatorMap);
+        map.putAll(logicalOperatorMap);
+        map.putAll(arithmeticOperatorMap);
+        map.putAll(comparisonMap);
+        map.putAll(reservedWordsMap);
+        return map;
+    }
+
+    
+    /**
+     * Formats a map into a string with key-value pairs.
+     * @param map The input map to format.
+     * @return Formatted string with key-value pairs.
+     */
+    private static String formatMap(Map<String, String> map) {
+        StringBuilder formattedOutput = new StringBuilder();
+        
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            formattedOutput.append(entry.getKey())
+                            .append(" : ")
+                            .append(entry.getValue())
+                            .append(" , ");
+        }
+
+        // Remove the trailing comma and space
+        if (formattedOutput.length() > 2) {
+            formattedOutput.setLength(formattedOutput.length() - 2);
+        }
+
+        return formattedOutput.toString();
+    }
+
+    /**
+     * Checks if a given string is a reserved word in the language.
+     * @param string The input string to check.
+     * @return true if the string is a reserved word, false otherwise.
+     */
+    private static Boolean isReservedWord(String string){
+        List<String> keysList = getKeysList(reservedWordsMap);
+        for (int i = 0; i < keysList.size(); i++) {
+            keysList.set(i, keysList.get(i).toLowerCase());
+        }
+        return keysList.contains(string);
+    }
+
+    /**
+     * Returns a list of keys from a given map.
+     * @param map The map to get the keys from.
+     * @return List of Keys.
+     */
+    private static List<String> getKeysList(Map<String, String> map) {
+        List<String> keysList = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            keysList.add(entry.getKey());
+        }
+
+        return keysList;
+    }
 }
+

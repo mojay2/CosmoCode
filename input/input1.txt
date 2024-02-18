@@ -5,8 +5,8 @@ Whirl ( var2 <= var1 ) {
 } ;
 Launch {
     var2 -- ;
-} whirl ( var2 != 0 || var2 != 5 ) ;
-Orbit ( var1 > var2 ) {
+} Whirl ( var2 != 0 || var2 != 5 ) ;
+Orbit ( var1 > var2 ) { &&;
     transmission ( "Greater!" ) ;
 } Navigate ( var1 < var2 ) {
     transmission ( "Lesser!" ) ;
