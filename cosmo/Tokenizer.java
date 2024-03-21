@@ -18,28 +18,38 @@ public class Tokenizer {
 
     public void processInputs() {
         for (int i = 1; i <= 3; i++) {
-            processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt");
+            processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt", "./output/symbol_table/output" + i + ".txt");
         }
     }
 
-    public void processInput(String inputPath, String outputPath) {
+    public void processInput(String inputPath, String outputPath, String symbolTablePath) {
         String input = readInput(inputPath);
         System.out.println("=================================================");
         System.out.println("Input from " + inputPath + ":\n" + input);
-
+    
         // split into array
         arrayInput = input.trim().split("\\s+");
         System.out.println("\nInput Converted to String Array:\n" + Arrays.toString(arrayInput));
 
+        // Get symbol table
+        Map<String, String> symbolTable = SymbolTable.createSymbolTableMap();
+    
         // pass to tokenizer
-        String[] tokenized = tokenize(arrayInput);
+        String[] tokenized = tokenize(arrayInput, symbolTable);
         System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
+    
+        // Print symbol table to console
         System.out.println("\nSymbol Table:\n");
-        System.out.println(formatMap(SymbolTable.createSymbolTableMap()));
+        System.out.println(formatMap(symbolTable));
+        
+        // Write symbol table to file
+        writeSymbolTableToFile(symbolTablePath, symbolTable);
+    
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
     }
+    
 
     public String readInput(String inputPath) {
         StringBuilder inputBuilder = new StringBuilder();
@@ -66,7 +76,19 @@ public class Tokenizer {
         }
     }
 
-    public String[] tokenize(String[] input) {
+    private void writeSymbolTableToFile(String outputPath, Map<String, String> symbolTable) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
+            writer.write("Symbol Table:\n");
+            for (Map.Entry<String, String> entry : symbolTable.entrySet()) {
+                writer.write(entry.getKey() + " : " + entry.getValue() + "\n");
+            }
+            System.out.println("Symbol table written to: " + outputPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] tokenize(String[] input, Map<String, String> symbolTable) {
         ArrayList<String> tokenList = new ArrayList<>();
         counter = 0;
         totalErrors = 0;
@@ -84,15 +106,15 @@ public class Tokenizer {
                 tokenList.add("logic_" + LogicalOperators.createLogicalMap().get(input[i]));
             } else if (ArithmeticOperators.createArithmeticMap().containsKey(input[i])) { // Arithmetic Operator
                 tokenList.add("arith_" + ArithmeticOperators.createArithmeticMap().get(input[i]));
-            } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Identifier / ?Variable?
+            }  else if (input[i].matches("[a-zA-Z0-9_]+")) { // Identifier / ?Variable?
                 if (isReservedWord(input[i])) {
                     counter++;
                     tokenList.add("invalid_token_" + counter);
                     totalErrors++;
                 }
                 tokenList.add("id_" + input[i]);
-                if (!SymbolTable.createSymbolTableMap().containsKey(input[i])) {
-                    SymbolTable.createSymbolTableMap().put(input[i], "id_" + input[i]);
+                if (!symbolTable.containsKey(input[i])) {
+                    symbolTable.put(input[i], "id_" + input[i]);
                 }
             } else if (input[i].matches("\\s+")) { // White Space
             } else if (input[i].startsWith("\"")) { // String
