@@ -63,6 +63,5 @@ REDUCE TO decStmt decStmt comet_token identifier arith_assign term arith_plus id
 REDUCE TO decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac transmissionStmt <- transmission_token ioStmt     ,,
 REDUCE TO decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac expr <- transmissionStmt      ,,
 SHIFT,decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac expr,sep_cl_brac sep_semicolon
-SHIFT,decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac expr sep_cl_brac,sep_semicolon
-SHIFT,decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac expr sep_cl_brac sep_semicolon,
+SHIFT,decStmt decStmt comet_token identifier arith_assign term arith_plus identifier sep_semicolon orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac propel_token sep_op_brac expr sep_cl_brac,
 REJECT,,

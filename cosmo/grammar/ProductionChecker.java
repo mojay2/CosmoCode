@@ -107,7 +107,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("assign_variable") && 
+            if (stk[z].equals("identifier") && 
             stk[z+1].equals("arith_assign") &&
             (stk[z+2].equals("identifier") || stk[z+2].equals("comet_literal") || stk[z+2].equals("arithmeticExp")) &&
             stk[z+3].equals("sep_semicolon")) {
@@ -266,7 +266,6 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REACHED ", "", ""});
                 dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
                 return;
             }
@@ -292,22 +291,21 @@ public class ProductionChecker {
     }
 
     private static void checkStatementProduction(String[] stk, List<String[]> dataTable) {
+        // Iterate through the stack elements
         for (int z = 0; z < stk.length - 2; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
+            // Check if the current sequence matches the production rule
             if (stk[z].equals("sep_op_brac") && stk[z + 1].equals("expr") && stk[z + 2].equals("sep_cl_brac")) {
-                // Perform reduction for identifier
+                // Perform reduction for the production rule
                 stk[z] = "stmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
-
+    
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk), "", ""});
                 return;
             }
         }
-    }
+    }   
 
     private static void checkTermProduction(String[] stk, List<String[]> dataTable) {
         for (int z = 0; z < stk.length; z++) {
@@ -345,7 +343,7 @@ public class ProductionChecker {
     }
 
     private static void checkTerm2Production(String[] stk, List<String[]> dataTable) {
-        for (int z = 0; z < stk.length; z++) {
+        for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal

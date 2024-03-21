@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Iterator;
 
 public class Parser {
@@ -46,38 +47,63 @@ public class Parser {
         dataTable.add(new String[]{"Action", "Stack", "Remaining Input"});
     
         // Iterate over the input tokens
-        int i = 0;
         String action;
-        for (int j = 0; j <= tokenLength; j++) {
+        for (int j = 0; j < tokenLength - 1; j++) {
             // Set the action to "SHIFT" initially
             action = "SHIFT";
-    
-            // Print action              
+
+            // Print action
             dataTable.add(new String[]{action, joinWithoutNull(stk), joinWithoutNull(Arrays.copyOfRange(tokens, j, tokenLength))});
-    
-            if (j < tokenLength) {
-                stk[i] = tokens[j];
-            }
-    
-            // Increment stack index
-            i++;
-    
+
+            // Add token to the stack at the next available position
+            stk[j] = tokens[j];
+
             // Check stack for production rules
             check(stk, dataTable);
         }
-    
-        // Perform one last check for remaining productions
+
+        // Process the last token separately
+        action = "SHIFT";
+        dataTable.add(new String[]{action, joinWithoutNull(stk), ""}); // Last token doesn't have remaining input
+
+        // Add the last token to the stack
+        stk[tokenLength - 1] = tokens[tokenLength - 1];
+
+        // Check stack for production rules after adding the last token
         check(stk, dataTable);
 
+
+    
         // Check if the stack contains only valid tokens
         boolean isValidInput = true;
-        for (int k = 0; k < tokenLength; k++) {
-            if (!stk[k].equals("expr")) { // TO BE EDITED
+        String[] validTokens = {"decStmt", "expr", "transmissionStmt", "arithmeticExp", "orbitStmt", "whirlLoop", "launchWhirlLoop"};
+    
+        // Filter out empty strings from the stack
+        List<String> filteredStack = Arrays.stream(stk)
+                                        .filter(s -> !s.isEmpty())
+                                        .collect(Collectors.toList());
+
+        // Convert the filtered stack back to an array
+        String[] filteredStk = filteredStack.toArray(new String[0]);
+
+        // Check if the stack contains only valid tokens
+        for (String token : filteredStk) {
+            boolean tokenFound = false;
+            for (String validToken : validTokens) {
+                if (token.equals(validToken)) {
+                    tokenFound = true;
+                    break;
+                }
+            }
+            if (!tokenFound) {
                 isValidInput = false;
                 break;
             }
         }
 
+
+        System.out.println("CHECK: " + Arrays.toString(filteredStk));
+    
         if (!isValidInput) {
             ArrayList<String> list = new ArrayList<>();
             for (int n = 0; n < stk.length; n++) {
@@ -91,7 +117,7 @@ public class Parser {
                 isValidInput = true;
             }
         }
-        
+    
         // Print output based on input validity
         if (isValidInput) {
             System.out.println("Accept");
@@ -100,10 +126,11 @@ public class Parser {
             System.out.println("Reject");
             dataTable.add(new String[]{"REJECT", "", ""});
         }
-        
-         // Write data to CSV file
-         writeOutputToFile(filePath, dataTable);
+    
+        // Write data to CSV file
+        writeOutputToFile(filePath, dataTable);
     }
+    
     
     public static String joinWithoutNull(String[] arr) {
         StringBuilder result = new StringBuilder();

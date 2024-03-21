@@ -1,11 +1,19 @@
+orbit_token
+sep_op_par
+id_result
+comp_less_eq
+comet_15
+sep_cl_par
+sep_op_brac
+transmission_token
+sep_op_par
+"Result is less than or equal to 15"
+sep_cl_par
+sep_semicolon
+sep_cl_brac
+sep_semicolon
 comet_token
-id_var
+id_x
 arith_assign
 comet_3
 sep_semicolon
-sep_op_par
-id_x
-comp_great
-comet_3
-sep_cl_par
-"hello"

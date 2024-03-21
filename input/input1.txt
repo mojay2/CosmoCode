@@ -1,1 +1,4 @@
-Comet var = 3 ; ( x > 3 ) "hello"
+Orbit ( result <= 15 ) {
+    transmission ( "Result is less than or equal to 15" ) ;
+} ; 
+Comet x = 3 ;
