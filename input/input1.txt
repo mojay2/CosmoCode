@@ -1,4 +1,16 @@
-Orbit ( result <= 15 ) {
-    transmission ( "Result is less than or equal to 15" ) ;
-} ; 
-Comet x = 3 ;
+Comet var1 = 3 ; /* Assigning value 3 to variable var1 */
+Comet var2 = 10 ; /* Assigning value 10 to variable var2 */
+Whirl ( var2 <= var1 ) {
+    transmission ( "hello" ) ;
+} ;
+Launch {
+    transmission ( "Greater!" ) ;
+} Whirl ( var2 != 0 && var1 < 2 ) ;
+Orbit ( var1 > var2 ) {
+    transmission ( "Greater!" ) ;
+} Navigate ( var1 < var2 ) {
+    transmission ( "Lesser!" ) ;
+} Propel {
+    transmission ( "Equal!" ) ;
+}
+;

@@ -234,7 +234,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && stk[z + 1].equals("logicalOp") && (stk[z+2].equals("identifier") || stk[z+2].equals("comet_literal"))) {
+            if (stk[z].equals("relationalExp") && stk[z + 1].equals("logicalOp") && stk[z + 2].equals("relationalExp")) {
                 // Perform reduction for identifier
                 stk[z] = "logicalExp";
                 stk[z + 1] = "";
@@ -641,7 +641,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("launch_token") && 
+            if (stk[z].equals("launchwhirl_token") && 
             stk[z + 1].equals("stmt") && 
             stk[z + 2].equals("whirl_token") && 
             stk[z + 3].equals("conditionalExp") &&
