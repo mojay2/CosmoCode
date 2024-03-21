@@ -11,25 +11,28 @@ SHIFT,orbit_token sep_op_par identifier relationalOp,comet_15 sep_cl_par sep_op_
 REDUCE TO orbit_token sep_op_par identifier relationalOp comet_literal <- comet_15              ,,
 REDUCE TO orbit_token sep_op_par relationalExp <- identifier relationalOp comet_literal              ,,
 SHIFT,orbit_token sep_op_par relationalExp,sep_cl_par sep_op_brac transmission_token sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par,sep_op_brac transmission_token sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac,transmission_token sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token,sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token sep_op_par,"Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token sep_op_par string <- "Result is less than or equal to 15"         ,,
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token sep_op_par string,sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token sep_op_par string sep_cl_par,sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmission_token ioStmt <- sep_op_par string sep_cl_par sep_semicolon       ,,
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac transmissionStmt <- transmission_token ioStmt          ,,
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr <- transmissionStmt           ,,
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr,sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac,sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon,comet_token id_x arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token,id_x arith_assign comet_3 sep_semicolon
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier <- id_x   ,,
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier,arith_assign comet_3 sep_semicolon
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier arith_assign,comet_3 sep_semicolon
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier arith_assign comet_literal <- comet_3 ,,
-SHIFT,orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier arith_assign comet_literal,
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon comet_token identifier arith_assign comet_literal sep_semicolon <- comet_literal sep_semicolon,,
-REDUCE TO orbit_token sep_op_par relationalExp sep_cl_par sep_op_brac expr sep_cl_brac sep_semicolon decStmt <- comet_token identifier arith_assign comet_literal sep_semicolon,,
-REJECT,,
+REDUCE TO orbit_token conditionalExp <- sep_op_par relationalExp sep_cl_par               ,,
+SHIFT,orbit_token conditionalExp,sep_op_brac transmission_token sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+SHIFT,orbit_token conditionalExp sep_op_brac,transmission_token sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+SHIFT,orbit_token conditionalExp sep_op_brac transmission_token,sep_op_par "Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+SHIFT,orbit_token conditionalExp sep_op_brac transmission_token sep_op_par,"Result is less than or equal to 15" sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+REDUCE TO orbit_token conditionalExp sep_op_brac transmission_token sep_op_par string <- "Result is less than or equal to 15"             ,,
+SHIFT,orbit_token conditionalExp sep_op_brac transmission_token sep_op_par string,sep_cl_par sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+SHIFT,orbit_token conditionalExp sep_op_brac transmission_token sep_op_par string sep_cl_par,sep_semicolon sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+REDUCE TO orbit_token conditionalExp sep_op_brac transmission_token ioStmt <- sep_op_par string sep_cl_par sep_semicolon           ,,
+REDUCE TO orbit_token conditionalExp sep_op_brac transmissionStmt <- transmission_token ioStmt              ,,
+REDUCE TO orbit_token conditionalExp sep_op_brac expr <- transmissionStmt               ,,
+SHIFT,orbit_token conditionalExp sep_op_brac expr,sep_cl_brac sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+REDUCE TO orbit_token conditionalExp stmt,,
+SHIFT,orbit_token conditionalExp stmt,sep_semicolon comet_token id_x arith_assign comet_3 sep_semicolon
+REDUCE TO orbitStmt <- orbit_token conditionalExp stmt sep_semicolon               ,,
+SHIFT,orbitStmt,comet_token id_x arith_assign comet_3 sep_semicolon
+SHIFT,orbitStmt comet_token,id_x arith_assign comet_3 sep_semicolon
+REDUCE TO orbitStmt comet_token identifier <- id_x                ,,
+SHIFT,orbitStmt comet_token identifier,arith_assign comet_3 sep_semicolon
+SHIFT,orbitStmt comet_token identifier arith_assign,comet_3 sep_semicolon
+REDUCE TO orbitStmt comet_token identifier arith_assign comet_literal <- comet_3              ,,
+SHIFT,orbitStmt comet_token identifier arith_assign comet_literal,
+REDUCE TO orbitStmt comet_token identifier arith_assign comet_literal sep_semicolon <- comet_literal sep_semicolon             ,,
+REDUCE TO orbitStmt decStmt <- comet_token identifier arith_assign comet_literal sep_semicolon             ,,
+ACCEPT,,

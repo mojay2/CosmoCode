@@ -1,6 +1,6 @@
 package cosmo.grammar;
 
-import java.util.List;
+import java.util.*;
 
 public class ProductionChecker {
 
@@ -39,6 +39,7 @@ public class ProductionChecker {
     }
 
     private static void checkStringProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -53,6 +54,7 @@ public class ProductionChecker {
     }
 
     private static void checkIdentifierProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -66,6 +68,7 @@ public class ProductionChecker {
     }
 
     private static void checkCometLiteralProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -79,6 +82,7 @@ public class ProductionChecker {
     }
 
     private static void checkDeclarationProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -103,6 +107,7 @@ public class ProductionChecker {
     }
 
     private static void checkAssignmentProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -125,6 +130,7 @@ public class ProductionChecker {
     }
 
     private static void checkIoStatementProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -145,6 +151,7 @@ public class ProductionChecker {
     }
 
     private static void checkTransmissionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -162,6 +169,7 @@ public class ProductionChecker {
     }
 
     private static void checkReceptionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -181,6 +189,7 @@ public class ProductionChecker {
     }
 
     private static void checkRelationalOperatorProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -202,6 +211,7 @@ public class ProductionChecker {
     }
 
     private static void checkLogicalOperatorProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -219,6 +229,7 @@ public class ProductionChecker {
     }
 
     private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -237,6 +248,7 @@ public class ProductionChecker {
     }
 
     private static void checkRelationalExpressionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -255,6 +267,7 @@ public class ProductionChecker {
     }
 
     private static void checkConditionalExpressionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -273,6 +286,7 @@ public class ProductionChecker {
     }
 
     private static void checkExpressionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -291,6 +305,7 @@ public class ProductionChecker {
     }
 
     private static void checkStatementProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         // Iterate through the stack elements
         for (int z = 0; z < stk.length - 2; z++) {
             // Check if the current sequence matches the production rule
@@ -308,6 +323,7 @@ public class ProductionChecker {
     }   
 
     private static void checkTermProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -324,6 +340,7 @@ public class ProductionChecker {
     }
 
     private static void checkTermPrimeProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -343,6 +360,7 @@ public class ProductionChecker {
     }
 
     private static void checkTerm2Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -359,6 +377,7 @@ public class ProductionChecker {
     }
 
     private static void checkTermPrime2Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -392,6 +411,7 @@ public class ProductionChecker {
     }*/
 
     private static void checkTermPrime3Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -422,6 +442,7 @@ public class ProductionChecker {
     }
 
     private static void checkTerm3Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -439,6 +460,7 @@ public class ProductionChecker {
     }
 
     private static void checkArithmeticExpPrimeProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -458,6 +480,7 @@ public class ProductionChecker {
     }
 
     private static void checkArithmeticExpressionProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -475,6 +498,7 @@ public class ProductionChecker {
     }
 
     private static void checkNavigateProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -495,6 +519,7 @@ public class ProductionChecker {
     }
 
     private static void checkPropelProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -513,6 +538,7 @@ public class ProductionChecker {
     }
 
     private static void checkOrbitProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -535,6 +561,7 @@ public class ProductionChecker {
     }
 
     private static void checkOrbit2Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -559,6 +586,7 @@ public class ProductionChecker {
     }
 
     private static void checkOrbit3Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 5; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -585,6 +613,7 @@ public class ProductionChecker {
     }
 
     private static void checkWhirlLoopProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -607,6 +636,7 @@ public class ProductionChecker {
     }
 
     private static void checkLaunchWhirlLoopProduction(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
@@ -651,5 +681,22 @@ public class ProductionChecker {
             }
         }
         return originalBuilder.toString();
+    }
+
+    static void removeEmptyValuesInBetween(String[] array) {
+        boolean foundNonEmpty = false;
+        int writeIndex = 0;
+
+        for (int readIndex = 0; readIndex < array.length; readIndex++) {
+            if (!array[readIndex].isEmpty()) {
+                if (foundNonEmpty && writeIndex != readIndex) {
+                    array[writeIndex++] = array[readIndex];
+                    array[readIndex] = "";
+                } else {
+                    writeIndex++;
+                }
+                foundNonEmpty = true;
+            }
+        }
     }
 }
