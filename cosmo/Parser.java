@@ -3,11 +3,13 @@ package cosmo;
 import cosmo.grammar.ProductionChecker;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.io.FileNotFoundException;
 
 public class Parser {
     private String[] tokens;
@@ -18,8 +20,8 @@ public class Parser {
 
     int tokenLength = 0;
 
-    void check(String[] stk, List<String[]> dataTable) {
-        ProductionChecker.checkProductions(stk, dataTable);
+    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
+        ProductionChecker.checkProductions(stk, dataTable, root);
     }
     
     public void parse(int fileNumber) {
@@ -32,12 +34,14 @@ public class Parser {
         tokenLength = tokens.length;
     
         // Define the file path
-        String filePath = "./output/parser/output" + fileNumber + ".csv";
+        String parserFilePath = "./output/parser/output" + fileNumber + ".csv";
+        String parseTreeFilePath = "./output/parse_tree/output" + fileNumber + ".txt";
     
         // Define a String array to hold the stk and remainingInput
         String[] stk = new String[tokenLength];
         Arrays.fill(stk, ""); // Initialize stk with empty strings
     
+        ParseTreeNode root = new ParseTreeNode("Program " + fileNumber);
         // Define an ArrayList to hold data
         List<String[]> dataTable = new ArrayList<>();
     
@@ -56,10 +60,11 @@ public class Parser {
             dataTable.add(new String[]{action, joinWithoutNull(stk), joinWithoutNull(Arrays.copyOfRange(tokens, j, tokenLength))});
 
             // Add token to the stack at the next available position
+            root.addChild(new ParseTreeNode(tokens[j]));
             stk[j] = tokens[j];
 
             // Check stack for production rules
-            check(stk, dataTable);
+            check(stk, dataTable, root);
         }
 
         // Process the last token separately
@@ -68,9 +73,10 @@ public class Parser {
 
         // Add the last token to the stack
         stk[tokenLength - 1] = tokens[tokenLength - 1];
+        root.addChild(new ParseTreeNode(tokens[tokenLength - 1]));
 
         // Check stack for production rules after adding the last token
-        check(stk, dataTable);
+        check(stk, dataTable, root);
 
 
     
@@ -128,7 +134,14 @@ public class Parser {
         }
     
         // Write data to CSV file
-        writeOutputToFile(filePath, dataTable);
+        writeOutputToFile(parserFilePath, dataTable);
+
+        String treeString = root.printTree();
+        try (PrintWriter out = new PrintWriter(parseTreeFilePath)) {
+            out.println(treeString);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     
     

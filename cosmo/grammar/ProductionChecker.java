@@ -1,25 +1,26 @@
 package cosmo.grammar;
 
+import cosmo.ParseTreeNode;
 import java.util.*;
 
 public class ProductionChecker {
 
-    public static void checkProductions(String[] stk, List<String[]> dataTable) {
-        checkStringProduction(stk, dataTable);
-        checkIdentifierProduction(stk, dataTable);
-        checkCometLiteralProduction(stk, dataTable);
-        checkDeclarationProduction(stk, dataTable);
-        checkAssignmentProduction(stk, dataTable);
-        checkIoStatementProduction(stk, dataTable);
-        checkTransmissionProduction(stk, dataTable);
-        checkReceptionProduction(stk, dataTable);
-        checkRelationalOperatorProduction(stk, dataTable);
-        checkLogicalOperatorProduction(stk, dataTable);
-        checkLogicalExpressionProduction(stk, dataTable);
-        checkRelationalExpressionProduction(stk, dataTable);
-        checkConditionalExpressionProduction(stk, dataTable);
-        checkExpressionProduction(stk, dataTable);
-        checkStatementProduction(stk, dataTable);
+    public static void checkProductions(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
+        checkStringProduction(stk, dataTable, root);
+        checkIdentifierProduction(stk, dataTable, root);
+        checkCometLiteralProduction(stk, dataTable, root);
+        checkDeclarationProduction(stk, dataTable, root);
+        checkAssignmentProduction(stk, dataTable, root);
+        checkIoStatementProduction(stk, dataTable, root);
+        checkTransmissionProduction(stk, dataTable, root);
+        checkReceptionProduction(stk, dataTable, root);
+        checkRelationalOperatorProduction(stk, dataTable, root);
+        checkLogicalOperatorProduction(stk, dataTable, root);
+        checkLogicalExpressionProduction(stk, dataTable, root);
+        checkRelationalExpressionProduction(stk, dataTable, root);
+        checkConditionalExpressionProduction(stk, dataTable, root);
+        checkExpressionProduction(stk, dataTable, root);
+        checkStatementProduction(stk, dataTable, root);
         checkTermProduction(stk, dataTable);
         checkTermPrimeProduction(stk, dataTable);
         checkTerm2Production(stk, dataTable);
@@ -29,16 +30,16 @@ public class ProductionChecker {
         checkTerm3Production(stk, dataTable);
         checkArithmeticExpPrimeProduction(stk, dataTable);
         checkArithmeticExpressionProduction(stk, dataTable);
-        checkNavigateProduction(stk, dataTable);
-        checkPropelProduction(stk, dataTable);
-        checkOrbitProduction(stk, dataTable);
-        checkOrbit2Production(stk, dataTable);
-        checkOrbit3Production(stk, dataTable);
-        checkWhirlLoopProduction(stk, dataTable);
-        checkLaunchWhirlLoopProduction(stk, dataTable);
+        checkNavigateProduction(stk, dataTable, root);
+        checkPropelProduction(stk, dataTable, root);
+        checkOrbitProduction(stk, dataTable, root);
+        checkOrbit2Production(stk, dataTable, root);
+        checkOrbit3Production(stk, dataTable, root);
+        checkWhirlLoopProduction(stk, dataTable, root);
+        checkLaunchWhirlLoopProduction(stk, dataTable, root);
     }
 
-    private static void checkStringProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkStringProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
@@ -47,13 +48,20 @@ public class ProductionChecker {
             if (stk[z].startsWith("\"") && stk[z].endsWith("\"")) {
                 stk[z] = "string";
                 stk[z + 1] = "";
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
-                return;
+
+                // Add reduction to dataTable
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("string");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
             }
         }
     }
 
-    private static void checkIdentifierProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkIdentifierProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -62,12 +70,21 @@ public class ProductionChecker {
             if (stk[z].startsWith("id_")) {
                 // Perform reduction for identifier
                 stk[z] = "identifier";
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+
+                // Add reduction to dataTable
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("identifier");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+                return;
             } 
         }
     }
 
-    private static void checkCometLiteralProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkCometLiteralProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -76,46 +93,61 @@ public class ProductionChecker {
             if (stk[z].startsWith("comet_") && !stk[z].startsWith("comet_token")) {
                 // Perform reduction for identifier
                 stk[z] = "comet_literal";
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+
+                // Add reduction to dataTable
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                System.out.println("AHHH: ");
+                root.logTree();
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("comet_literal");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
             } 
         }
     }
 
-    private static void checkDeclarationProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkDeclarationProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 4; z++) {
+        for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("comet_token") && 
-            stk[z+1].equals("identifier") &&
-            stk[z+2].equals("arith_assign") && 
-            (stk[z+3].equals("identifier") || stk[z+3].equals("comet_literal") || stk[z+3].equals("arithmeticExp")) &&
-            stk[z+4].equals("sep_semicolon")) {
+            // Check for producing rule decStmt -> comet_token id arith_assign
+            if (stk[z].equals("comet_token") &&
+                    stk[z + 1].equals("assignStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "decStmt";
-                stk[z+1] = "";
-                stk[z+2] = "";
-                stk[z+3] = "";
-                stk[z+4] = "";
+                stk[z + 1] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("decStmt");
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkAssignmentProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkAssignmentProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("identifier") && 
-            stk[z+1].equals("arith_assign") &&
-            (stk[z+2].equals("identifier") || stk[z+2].equals("comet_literal") || stk[z+2].equals("arithmeticExp")) &&
-            stk[z+3].equals("sep_semicolon")) {
+            if (stk[z].equals("assign_variable") &&
+                    stk[z + 1].equals("arith_assign") &&
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
+                            || stk[z + 2].equals("arithmeticExp"))
+                    &&
+                    stk[z + 3].equals("sep_semicolon")) {
                 // Perform reduction for identifier
                 stk[z] = "assignStmt";
                 stk[z+1] = "";
@@ -123,13 +155,26 @@ public class ProductionChecker {
                 stk[z+3] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("assignStmt");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkIoStatementProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkIoStatementProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
@@ -144,13 +189,26 @@ public class ProductionChecker {
                 stk[z+3] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("ioStmt");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkTransmissionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkTransmissionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
@@ -162,13 +220,22 @@ public class ProductionChecker {
                 stk[z+1] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("transmissionStmt");
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkReceptionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkReceptionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
@@ -182,13 +249,28 @@ public class ProductionChecker {
                 stk[z + 3] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("receptionStmt");
+                reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                root.addChild(reducedNode);
+                root.addChild(previousNode);
+
                 return;
             }
         }
     }
 
-    private static void checkRelationalOperatorProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkRelationalOperatorProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -204,13 +286,20 @@ public class ProductionChecker {
                 stk[z] = "relationalOp";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("relationalOp");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkLogicalOperatorProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkLogicalOperatorProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -222,13 +311,19 @@ public class ProductionChecker {
                 stk[z] = "logicalOp";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("logicalOp");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
                 return;
             }
         }
     }
 
-    private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
@@ -241,13 +336,25 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkRelationalExpressionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkRelationalExpressionProduction(String[] stk, List<String[]> dataTable,
+            ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
@@ -260,13 +367,27 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("relationalExp");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                root.addChild(reducedNode);
+                root.addChild(previousNode);
+
                 return;
             }
         }
     }
 
-    private static void checkConditionalExpressionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkConditionalExpressionProduction(String[] stk, List<String[]> dataTable,
+            ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
@@ -279,13 +400,26 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("conditionalExp");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                root.addChild(reducedNode);
+                root.addChild(previousNode);
+
                 return;
             }
         }
     }
 
-    private static void checkExpressionProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -298,16 +432,25 @@ public class ProductionChecker {
                 stk[z] = "expr";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("expr");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkStatementProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkStatementProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         // Iterate through the stack elements
         for (int z = 0; z < stk.length - 2; z++) {
+            String original = constructOriginalString(stk, z);
+
             // Check if the current sequence matches the production rule
             if (stk[z].equals("sep_op_brac") && stk[z + 1].equals("expr") && stk[z + 2].equals("sep_cl_brac")) {
                 // Perform reduction for the production rule
@@ -316,7 +459,18 @@ public class ProductionChecker {
                 stk[z + 2] = "";
     
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk), "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("stmt");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
@@ -497,7 +651,7 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkNavigateProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkNavigateProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
@@ -512,13 +666,24 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("navigateStmt");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkPropelProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkPropelProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
@@ -531,13 +696,24 @@ public class ProductionChecker {
                 stk[z + 1] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("propelStmt");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                root.addChild(reducedNode);
+                root.addChild(previousNode);
+
                 return;
             }
         }
     }
 
-    private static void checkOrbitProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkOrbitProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
@@ -554,13 +730,26 @@ public class ProductionChecker {
                 stk[z + 3] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkOrbit2Production(String[] stk, List<String[]> dataTable) {
+    private static void checkOrbit2Production(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
@@ -579,13 +768,28 @@ public class ProductionChecker {
                 stk[z + 4] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkOrbit3Production(String[] stk, List<String[]> dataTable) {
+    private static void checkOrbit3Production(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 5; z++) {
             String original = constructOriginalString(stk, z);
@@ -606,13 +810,30 @@ public class ProductionChecker {
                 stk[z + 5] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode previousNode6 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                reducedNode.addChild(previousNode6);
+                reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
     }
 
-    private static void checkWhirlLoopProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkWhirlLoopProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
@@ -629,13 +850,25 @@ public class ProductionChecker {
                 stk[z + 3] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("whirlLoop");
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
                 return;
             }
         }
     }
 
-    private static void checkLaunchWhirlLoopProduction(String[] stk, List<String[]> dataTable) {
+    private static void checkLaunchWhirlLoopProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
@@ -654,7 +887,22 @@ public class ProductionChecker {
                 stk[z + 4] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("launchWhirlLoop");
+                reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
                 return;
             }
         }
