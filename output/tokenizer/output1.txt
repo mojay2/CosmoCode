@@ -1,7 +1,5 @@
+id_var
+arith_plus
+comet_3
 "hello"
-id_variable
-"this is another string"
-id_testvar
-sep_op_par
-id_printThis
-sep_cl_par
+"edn"

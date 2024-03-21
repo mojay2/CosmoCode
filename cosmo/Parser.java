@@ -1,10 +1,12 @@
 package cosmo;
 
+import cosmo.grammar.ProductionChecker;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Iterator;
 
 public class Parser {
     private String[] tokens;
@@ -16,57 +18,7 @@ public class Parser {
     int tokenLength = 0;
 
     void check(String[] stk, List<String[]> dataTable) {
-        // Check stringStmt production
-        for (int z = 0; z < stk.length; z++) {
-            // Reset original for each iteration
-            StringBuilder originalBuilder = new StringBuilder();
-    
-            // Construct original string representation of the stack
-            for (int i = z; i < stk.length; i++) {
-                originalBuilder.append(stk[i]);
-                if (i < stk.length - 1) {
-                    originalBuilder.append(" ");
-                }
-            }
-            String original = originalBuilder.toString();
-    
-            // Check for producing rule stringStmt -> string or stringStmt -> id
-            if (stk[z].startsWith("\"") && stk[z].endsWith("\"")) {
-                // Perform reduction for stringStmt
-                stk[z] = "stringStmt";
-                stk[z + 1] = "";
-    
-                // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
-                return;
-            }
-        }
-
-        // Check for idStmt production
-        for (int z = 0; z < stk.length; z++) {
-            // Reset original for each iteration
-            StringBuilder originalBuilder = new StringBuilder();
-                
-            // Construct original string representation of the stack
-            for (int i = z; i < stk.length; i++) {
-                originalBuilder.append(stk[i]);
-                if (i < stk.length - 1) {
-                    originalBuilder.append(" ");
-                }
-            }
-            String original = originalBuilder.toString();
-
-            // Check for producing rule identifier -> id
-            if (stk[z].startsWith("id_")) {
-                // Perform reduction for stringStmt
-                stk[z] = "idStmt";
-                stk[z + 1] = "";
-    
-                // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
-                return;
-            }
-        }
+        ProductionChecker.checkProductions(stk, dataTable);
     }
     
     public void parse(int fileNumber) {
@@ -106,22 +58,58 @@ public class Parser {
             if (j < tokenLength) {
                 stk[i] = tokens[j];
             }
-            
+    
             // Increment stack index
             i++;
-            
+    
             // Check stack for production rules
             check(stk, dataTable);
         }
     
-        // Check for remaining productions
+        // Perform one last check for remaining productions
         check(stk, dataTable);
     
         // Write data to CSV file
         writeOutputToFile(filePath, dataTable);
+
+        // Check if the stack contains only valid tokens
+        boolean isValidInput = true;
+        for (int k = 0; k < tokenLength; k++) {
+            if (!stk[k].equals("programStmt")) { // TO BE EDITED
+                isValidInput = false;
+                break;
+            }
+        }
+
+        if (!isValidInput) {
+            ArrayList<String> list = new ArrayList<>();
+            for (int n = 0; n < stk.length; n++) {
+                if (!stk[n].equals(""))
+                    list.add(stk[n]);
+            }
+            list = checkProds(list);
+            list = retrieveValidTokens(list);
+            System.out.println(list);
+            if (list.get(0).equals("arithExp") && list.size() == 1) {
+                isValidInput = true;
+            }
+        }
+        
+
+        // Print output based on input validity
+        if (isValidInput) {
+            System.out.println("Accept");
+            dataTable.add(new String[]{"", "", ""});
+            dataTable.add(new String[]{"ACCEPT", "", ""});
+        } else {
+            System.out.println("Reject");
+            dataTable.add(new String[]{"", "", ""});
+            dataTable.add(new String[]{"REJECT", "", ""});
+        }
     }
     
-    static String joinWithoutNull(String[] arr) {
+    
+    public static String joinWithoutNull(String[] arr) {
         StringBuilder result = new StringBuilder();
         for (String str : arr) {
             if (str != null && !str.isEmpty()) {
@@ -146,5 +134,122 @@ public class Parser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    static ArrayList<String> checkProds(ArrayList<String> tokenList){
+        String action = "REDUCE TO -> ";
+        tokenList.add(0, "");
+        tokenList.add(0, "");
+        tokenList.add(0, "");
+        tokenList.add(0, "$");
+        tokenList.add(tokenList.size(), "%");
+        for (int i = tokenList.size() - 1; i >= 0; i--) {
+            if(tokenList.get(i).equals("$"))
+                break;
+            if(tokenList.get(i).equals(""))
+                continue;
+            String token = tokenList.get(i);
+            
+            //<termPrime> -> arith_mult <factor> <termPrime> | arith_div <factor> <termPrime>
+            if(token.equals("termPrime") && 
+            tokenList.get(i-1).equals("factor") && 
+            (tokenList.get(i-2).equals("arith_mult") || tokenList.get(i-2).equals("arith_div"))){
+                tokenList.set(i-2, "termPrime");
+                tokenList.set(i, "");
+                tokenList.set(i-1, "");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            }
+            // <arithExpPrime> -> arith_plus <term> <arithExpPrime> | arith_minus <term> <arithExpPrime>
+            else if(token.equals("arithExpPrime") && 
+            tokenList.get(i-1).equals("term") && 
+            (tokenList.get(i-2).equals("arith_plus") || tokenList.get(i-2).equals("arith_minus"))){
+                tokenList.set(i-2, "arithExpPrime");
+                tokenList.set(i, "");
+                tokenList.set(i-1, "");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            } 
+            // <term> -> <factor> <termPrime> 
+            else if(token.equals("termPrime") && 
+            tokenList.get(i-1).equals("factor") && 
+            (!tokenList.get(i-2).equals("arith_mult") && !tokenList.get(i-2).equals("arith_div"))){
+                tokenList.set(i-1, "term");
+                tokenList.set(i, "");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            }
+            // when term is rightmost token, add <arithExpPrime> -> e
+            else if(token.equals("term") && 
+            !tokenList.get(i-1).equals("factor") && 
+            tokenList.get(i+1).equals("")){
+                tokenList.set(i+1, "arithExpPrime");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            }
+            // <arithExp> -> <term><arithExpPrime>
+            else if(token.equals("arithExpPrime") && 
+            tokenList.get(i-1).equals("term") && 
+            (!tokenList.get(i-2).equals("arith_plus") || !tokenList.get(i-2).equals("arith_minus"))){
+                tokenList.set(i-1, "arithExp");
+                tokenList.set(i, "");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            } 
+            // when factor is rightmost token, derive termPrime -> e
+            else if(token.equals("factor") && 
+            tokenList.get(i+1).equals("%")){
+                tokenList.add(i+1, "termPrime");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            } else if(token.equals("factor") && 
+            tokenList.get(i+1).equals("%")){
+                tokenList.add(i+1, "termPrime");
+                System.out.print(action);
+                printValidTokens(tokenList);
+                i = tokenList.size() - 1;
+            } 
+        }
+
+        return tokenList;
+    }
+
+    /**
+     * Iterates through the given list of tokens to remove dummy symbols
+     * and prints the valid tokens
+     * @param list list of tokens
+     */
+    static void printValidTokens(ArrayList<String> list) {
+        Iterator<String> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            String element = iterator.next();
+            if (!element.isEmpty() && !element.equals("$") && !element.equals("%")) {
+                System.out.print(element + " ");
+            }
+        }
+        System.out.println();
+    }
+
+    /**
+     * Iterates through the given list of tokens to remove dummy symbols
+     * and returns the updated list of valid tokens
+     * @param list list of tokens
+     * @return list of valid tokens
+     */
+    static ArrayList<String> retrieveValidTokens(ArrayList<String> list) {
+        ArrayList<String> result = new ArrayList<>();
+        Iterator<String> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            String element = iterator.next();
+            if (!element.isEmpty() && !element.equals("$") && !element.equals("%")) {
+                result.add(element);            }
+        }
+        return result;
     }
 }

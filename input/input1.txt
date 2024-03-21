@@ -1,1 +1,1 @@
-"hello" variable "this is another string" testvar ( printThis )
+var + 3 "hello" "edn"

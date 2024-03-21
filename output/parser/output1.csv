@@ -1,16 +1,15 @@
-Input String,"hello" id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par,
+Input String,id_var arith_plus comet_3 "hello" "edn",
 ,,
 Action,Stack,Remaining Input
-SHIFT,,"hello" id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par
-REDUCE TO stringStmt <- "hello"      ,,
-SHIFT,stringStmt,id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par
-REDUCE TO stringStmt idStmt <- id_variable     ,,
-SHIFT,stringStmt idStmt,"this is another string" id_testvar sep_op_par id_printThis sep_cl_par
-REDUCE TO stringStmt idStmt stringStmt <- "this is another string"    ,,
-SHIFT,stringStmt idStmt stringStmt,id_testvar sep_op_par id_printThis sep_cl_par
-REDUCE TO stringStmt idStmt stringStmt idStmt <- id_testvar   ,,
-SHIFT,stringStmt idStmt stringStmt idStmt,sep_op_par id_printThis sep_cl_par
-SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par,id_printThis sep_cl_par
-REDUCE TO stringStmt idStmt stringStmt idStmt sep_op_par idStmt <- id_printThis ,,
-SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par idStmt,sep_cl_par
-SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par idStmt sep_cl_par,
+SHIFT,,id_var arith_plus comet_3 "hello" "edn"
+REDUCE TO identifier <- id_var    ,,
+REDUCE TO factor <- identifier    ,,
+SHIFT,factor,arith_plus comet_3 "hello" "edn"
+REDUCE TO term arith_plus <- factor arith_plus   ,,
+SHIFT,term arith_plus,comet_3 "hello" "edn"
+REDUCE TO term arith_plus comet_literal <- comet_3  ,,
+REDUCE TO term arith_plus factor <- comet_literal  ,,
+SHIFT,term arith_plus factor,"hello" "edn"
+REDUCE TO term arith_plus factor string <- "hello" ,,
+SHIFT,term arith_plus factor string,"edn"
+SHIFT,term arith_plus factor string "edn",
