@@ -1,1 +1,1 @@
-var + 3 "hello" "edn"
+Comet var = 3 ; ( x > 3 ) "hello"

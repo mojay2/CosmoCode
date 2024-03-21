@@ -24,7 +24,7 @@ public class ProductionChecker {
         checkTermPrimeProduction(stk, dataTable);
         checkTerm2Production(stk, dataTable);
         checkTermPrime2Production(stk, dataTable);
-        checkFactorProduction(stk, dataTable);
+        // checkFactorProduction(stk, dataTable);
         checkTermPrime3Production(stk, dataTable);
         checkTerm3Production(stk, dataTable);
         checkArithmeticExpPrimeProduction(stk, dataTable);
@@ -218,25 +218,6 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkConditionalExpressionProduction(String[] stk, List<String[]> dataTable) {
-        for (int z = 0; z < stk.length - 2; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("sep_op_par") && stk[z + 1].equals("relationalExp") && stk[z+2].equals("sep_cl_par")) {
-                // Perform reduction for identifier
-                stk[z] = "conditionalExp";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[]{"REACHED ", "", ""});
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
-                return;
-            }
-        }
-    }
-
     private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable) {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
@@ -267,6 +248,25 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
+                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                return;
+            }
+        }
+    }
+
+    private static void checkConditionalExpressionProduction(String[] stk, List<String[]> dataTable) {
+        for (int z = 0; z < stk.length - 2; z++) {
+            String original = constructOriginalString(stk, z);
+
+            // Check for producing rule identifier -> id | comet_literal
+            if ((stk[z].equals("sep_op_par") && stk[z + 1].equals("relationalExp") && stk[z+2].equals("sep_cl_par")) || (stk[z].equals("sep_op_par") && stk[z + 1].equals("logicalExp") && stk[z+2].equals("sep_cl_par"))) {
+                // Perform reduction for identifier
+                stk[z] = "conditionalExp";
+                stk[z + 1] = "";
+                stk[z + 2] = "";
+
+                // Add reduction to dataTable
+                dataTable.add(new String[]{"REACHED ", "", ""});
                 dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
                 return;
             }
@@ -314,7 +314,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (z == 0 && stk[z].equals("factor") && (stk[z+1].equals("arith_plus") || stk[z+1].equals("arith_minus"))) {
+            if (z == 0 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z+1].equals("arith_plus") || stk[z+1].equals("arith_minus"))) {
                 // Perform reduction for identifier
                 stk[z] = "term";
 
@@ -330,7 +330,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (z > 1 && stk[z].equals("factor") && 
+            if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) && 
             (stk[z-1].equals("arith_mult") || stk[z-1].equals("arith_div")) && 
             (stk[z+1].equals("arith_plus") || stk[z+1].equals("arith_minus"))) {
                 // Perform reduction for identifier
@@ -349,7 +349,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("factor") && (stk[z+1].equals("arith_plus")||stk[z+1].equals("arith_minus"))) {
+            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z+1].equals("arith_plus")||stk[z+1].equals("arith_minus"))) {
                 // Perform reduction for identifier
                 stk[z] = "term";
 
@@ -365,7 +365,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (z > 0 && stk[z].equals("factor") && stk[z - 1].equals("arith_mult") && z == stk.length - 1) {
+            if (z > 0 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) && stk[z - 1].equals("arith_mult") && z == stk.length - 1) {
                 // Perform reduction for identifier
                 stk[z + 1] = "termPrime";
 
@@ -376,6 +376,7 @@ public class ProductionChecker {
         }
     }
 
+    /* 
     private static void checkFactorProduction(String[] stk, List<String[]> dataTable) {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -390,14 +391,14 @@ public class ProductionChecker {
                 return;
             }
         }
-    }
+    }*/
 
     private static void checkTermPrime3Production(String[] stk, List<String[]> dataTable) {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("arith_mult") && stk[z + 1].equals("factor") && stk[z + 2].equals("termPrime")) {
+            if (stk[z].equals("arith_mult") && (stk[z+1].equals("identifier") || stk[z+1].equals("comet_literal")) && stk[z + 2].equals("termPrime")) {
                 // Perform reduction for identifier
                 stk[z] = "termPrime";
                 stk[z + 1] = "";
@@ -409,7 +410,7 @@ public class ProductionChecker {
             }
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("arith_div") && stk[z + 1].equals("factor") && stk[z + 2].equals("termPrime")) {
+            if (stk[z].equals("arith_div") && (stk[z+1].equals("identifier") || stk[z+1].equals("comet_literal")) && stk[z + 2].equals("termPrime")) {
                 // Perform reduction for identifier
                 stk[z] = "termPrime";
                 stk[z + 1] = "";
@@ -427,7 +428,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("factor") && (stk[z + 1].equals("termPrime"))) {
+            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z + 1].equals("termPrime"))) {
                 // Perform reduction for identifier
                 stk[z] = "term";
                 stk[z + 1] = "";

@@ -68,14 +68,11 @@ public class Parser {
     
         // Perform one last check for remaining productions
         check(stk, dataTable);
-    
-        // Write data to CSV file
-        writeOutputToFile(filePath, dataTable);
 
         // Check if the stack contains only valid tokens
         boolean isValidInput = true;
         for (int k = 0; k < tokenLength; k++) {
-            if (!stk[k].equals("programStmt")) { // TO BE EDITED
+            if (!stk[k].equals("expr")) { // TO BE EDITED
                 isValidInput = false;
                 break;
             }
@@ -95,19 +92,18 @@ public class Parser {
             }
         }
         
-
         // Print output based on input validity
         if (isValidInput) {
             System.out.println("Accept");
-            dataTable.add(new String[]{"", "", ""});
             dataTable.add(new String[]{"ACCEPT", "", ""});
         } else {
             System.out.println("Reject");
-            dataTable.add(new String[]{"", "", ""});
             dataTable.add(new String[]{"REJECT", "", ""});
         }
+        
+         // Write data to CSV file
+         writeOutputToFile(filePath, dataTable);
     }
-    
     
     public static String joinWithoutNull(String[] arr) {
         StringBuilder result = new StringBuilder();

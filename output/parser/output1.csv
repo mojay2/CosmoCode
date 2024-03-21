@@ -1,15 +1,24 @@
-Input String,id_var arith_plus comet_3 "hello" "edn",
+Input String,comet_token id_var arith_assign comet_3 sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello",
 ,,
 Action,Stack,Remaining Input
-SHIFT,,id_var arith_plus comet_3 "hello" "edn"
-REDUCE TO identifier <- id_var    ,,
-REDUCE TO factor <- identifier    ,,
-SHIFT,factor,arith_plus comet_3 "hello" "edn"
-REDUCE TO term arith_plus <- factor arith_plus   ,,
-SHIFT,term arith_plus,comet_3 "hello" "edn"
-REDUCE TO term arith_plus comet_literal <- comet_3  ,,
-REDUCE TO term arith_plus factor <- comet_literal  ,,
-SHIFT,term arith_plus factor,"hello" "edn"
-REDUCE TO term arith_plus factor string <- "hello" ,,
-SHIFT,term arith_plus factor string,"edn"
-SHIFT,term arith_plus factor string "edn",
+SHIFT,,comet_token id_var arith_assign comet_3 sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+SHIFT,comet_token,id_var arith_assign comet_3 sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+REDUCE TO comet_token identifier <- id_var         ,,
+SHIFT,comet_token identifier,arith_assign comet_3 sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+SHIFT,comet_token identifier arith_assign,comet_3 sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+REDUCE TO comet_token identifier arith_assign comet_literal <- comet_3       ,,
+SHIFT,comet_token identifier arith_assign comet_literal,sep_semicolon sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+REDUCE TO comet_token identifier arith_assign comet_literal sep_semicolon <- comet_literal sep_semicolon      ,,
+REDUCE TO decStmt <- comet_token identifier arith_assign comet_literal sep_semicolon      ,,
+SHIFT,decStmt,sep_op_par id_x comp_great comet_3 sep_cl_par "hello"
+SHIFT,decStmt sep_op_par,id_x comp_great comet_3 sep_cl_par "hello"
+REDUCE TO decStmt sep_op_par identifier <- id_x    ,,
+SHIFT,decStmt sep_op_par identifier,comp_great comet_3 sep_cl_par "hello"
+REDUCE TO decStmt sep_op_par identifier relationalOp <- comp_great   ,,
+SHIFT,decStmt sep_op_par identifier relationalOp,comet_3 sep_cl_par "hello"
+REDUCE TO decStmt sep_op_par identifier relationalOp comet_literal <- comet_3  ,,
+REDUCE TO decStmt sep_op_par relationalExp <- identifier relationalOp comet_literal  ,,
+SHIFT,decStmt sep_op_par relationalExp,sep_cl_par "hello"
+SHIFT,decStmt sep_op_par relationalExp sep_cl_par,"hello"
+SHIFT,decStmt sep_op_par relationalExp sep_cl_par "hello",
+REJECT,,

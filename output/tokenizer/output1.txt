@@ -1,5 +1,11 @@
+comet_token
 id_var
-arith_plus
+arith_assign
 comet_3
+sep_semicolon
+sep_op_par
+id_x
+comp_great
+comet_3
+sep_cl_par
 "hello"
-"edn"
