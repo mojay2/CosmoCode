@@ -18,11 +18,14 @@ public class Tokenizer {
 
     public void processInputs() {
         for (int i = 1; i <= 3; i++) {
-            processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt", "./output/symbol_table/output" + i + ".txt");
+            String[] tokens = processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt", "./output/symbol_table/output" + i + ".txt");
+            Parser parser = new Parser(tokens);
+            parser.parse(i); // Invoke the parsing process
         }
     }
+    
 
-    public void processInput(String inputPath, String outputPath, String symbolTablePath) {
+    public String[] processInput(String inputPath, String outputPath, String symbolTablePath) {
         String input = readInput(inputPath);
         System.out.println("=================================================");
         System.out.println("Input from " + inputPath + ":\n" + input);
@@ -48,6 +51,8 @@ public class Tokenizer {
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
+
+        return tokenized;
     }
     
 

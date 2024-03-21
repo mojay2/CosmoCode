@@ -1,0 +1,16 @@
+Input String,"hello" id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par,
+,,
+Action,Stack,Remaining Input
+SHIFT,,"hello" id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par
+REDUCE TO stringStmt <- "hello"      ,,
+SHIFT,stringStmt,id_variable "this is another string" id_testvar sep_op_par id_printThis sep_cl_par
+REDUCE TO stringStmt idStmt <- id_variable     ,,
+SHIFT,stringStmt idStmt,"this is another string" id_testvar sep_op_par id_printThis sep_cl_par
+REDUCE TO stringStmt idStmt stringStmt <- "this is another string"    ,,
+SHIFT,stringStmt idStmt stringStmt,id_testvar sep_op_par id_printThis sep_cl_par
+REDUCE TO stringStmt idStmt stringStmt idStmt <- id_testvar   ,,
+SHIFT,stringStmt idStmt stringStmt idStmt,sep_op_par id_printThis sep_cl_par
+SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par,id_printThis sep_cl_par
+REDUCE TO stringStmt idStmt stringStmt idStmt sep_op_par idStmt <- id_printThis ,,
+SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par idStmt,sep_cl_par
+SHIFT,stringStmt idStmt stringStmt idStmt sep_op_par idStmt sep_cl_par,

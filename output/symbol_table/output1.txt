@@ -2,14 +2,14 @@ Symbol Table:
 && : and
 || : or
 <= : less_eq
+printThis : id_printThis
 transmission : transmission_token
 Propel : propel_token
 reception : reception_token
-var2 : id_var2
-var1 : id_var1
 ++ : incr
 -- : decr
 == : eq
+testvar : id_testvar
 Orbit : orbit_token
 ( : op_par
 Whirl : whirl_token
@@ -22,6 +22,7 @@ Voyage : voyage_token
 Launch : launchwhirl_token
 / : div
 Comet : comet_token
+variable : id_variable
 Navigate : navigate_token
 { : op_brac
 ; : semicolon
