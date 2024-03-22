@@ -8,13 +8,6 @@ id_y
 arith_assign
 comet_10
 sep_semicolon
-comet_token
-id_result
-arith_assign
-id_x
-arith_plus
-id_y
-sep_semicolon
 orbit_token
 sep_op_par
 id_result
