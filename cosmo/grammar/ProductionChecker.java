@@ -25,11 +25,11 @@ public class ProductionChecker {
         checkTermPrimeProduction(stk, dataTable);
         checkTerm2Production(stk, dataTable);
         checkTermPrime2Production(stk, dataTable);
-        // checkFactorProduction(stk, dataTable);
+        checkFactorProduction(stk, dataTable);
         checkTermPrime3Production(stk, dataTable);
         checkTerm3Production(stk, dataTable);
         checkArithmeticExpPrimeProduction(stk, dataTable);
-        checkArithmeticExpressionProduction(stk, dataTable);
+        // checkArithmeticExpressionProduction(stk, dataTable);
         checkNavigateProduction(stk, dataTable, root);
         checkPropelProduction(stk, dataTable, root);
         checkOrbitProduction(stk, dataTable, root);
@@ -37,6 +37,7 @@ public class ProductionChecker {
         checkOrbit3Production(stk, dataTable, root);
         checkWhirlLoopProduction(stk, dataTable, root);
         checkLaunchWhirlLoopProduction(stk, dataTable, root);
+        checkArithmeticExpressionProductionTemp(stk, dataTable);
     }
 
     private static void checkStringProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
@@ -110,15 +111,21 @@ public class ProductionChecker {
 
     private static void checkDeclarationProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
+        for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule decStmt -> comet_token id arith_assign
-            if (stk[z].equals("comet_token") &&
-                    stk[z + 1].equals("assignStmt")) {
+            if (stk[z].equals("comet_token") && 
+            stk[z+1].equals("identifier") &&
+            stk[z+2].equals("arith_assign") && 
+            (stk[z+3].equals("identifier") || stk[z+3].equals("comet_literal") || stk[z+3].equals("arithExp")) &&
+            stk[z+4].equals("sep_semicolon")) {
                 // Perform reduction for identifier
                 stk[z] = "decStmt";
                 stk[z + 1] = "";
+                stk[z + 2] = "";
+                stk[z + 3] = "";
+                stk[z + 4] = "";
 
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
@@ -126,8 +133,14 @@ public class ProductionChecker {
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode previousNode5 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("decStmt");
                 reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 
@@ -142,12 +155,10 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("assign_variable") &&
-                    stk[z + 1].equals("arith_assign") &&
-                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
-                            || stk[z + 2].equals("arithmeticExp"))
-                    &&
-                    stk[z + 3].equals("sep_semicolon")) {
+            if (stk[z].equals("identifier") && 
+            stk[z+1].equals("arith_assign") &&
+            (stk[z+2].equals("identifier") || stk[z+2].equals("comet_literal") || stk[z+2].equals("arithExp")) &&
+            stk[z+3].equals("sep_semicolon")) {
                 // Perform reduction for identifier
                 stk[z] = "assignStmt";
                 stk[z+1] = "";
@@ -427,7 +438,8 @@ public class ProductionChecker {
             // Check for producing rule identifier -> id | comet_literal
             if (stk[z].equals("receptionStmt") || 
             stk[z].equals("transmissionStmt") || 
-            stk[z].equals("arithmeticExp")) {
+            stk[z].equals("arithExp") ||
+            stk[z].equals("assignStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "expr";
 
@@ -476,6 +488,7 @@ public class ProductionChecker {
         }
     }   
 
+    // START OF ARITHMETIC 
     private static void checkTermProduction(String[] stk, List<String[]> dataTable) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
@@ -483,6 +496,23 @@ public class ProductionChecker {
 
             // Check for producing rule identifier -> id | comet_literal
             if (z == 0 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z+1].equals("arith_plus") || stk[z+1].equals("arith_minus"))) {
+                // Perform reduction for identifier
+                stk[z] = "term";
+
+                // Add reduction to dataTable
+                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                return;
+            }
+        }
+    }
+
+    private static void checkTerm2Production(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
+        for (int z = 0; z < stk.length - 1; z++) {
+            String original = constructOriginalString(stk, z);
+
+            // Check for producing rule identifier -> id | comet_literal
+            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z+1].equals("arith_plus")||stk[z+1].equals("arith_minus"))) {
                 // Perform reduction for identifier
                 stk[z] = "term";
 
@@ -513,26 +543,9 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkTerm2Production(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z+1].equals("arith_plus")||stk[z+1].equals("arith_minus"))) {
-                // Perform reduction for identifier
-                stk[z] = "term";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
-                return;
-            }
-        }
-    }
-
     private static void checkTermPrime2Production(String[] stk, List<String[]> dataTable) {
         removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length; z++) {
+        for (int z = 0; z < stk.length ; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
@@ -547,13 +560,13 @@ public class ProductionChecker {
         }
     }
 
-    /* 
     private static void checkFactorProduction(String[] stk, List<String[]> dataTable) {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("identifier") || stk[z].equals("comet_literal")) {
+            if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
+                (stk[z-1].equals("arith_plus") || stk[z-1].equals("arith_minus") || stk[z-1].equals("arith_mult") || stk[z-1].equals("arith_div"))) {
                 // Perform reduction for identifier
                 stk[z] = "factor";
 
@@ -562,7 +575,7 @@ public class ProductionChecker {
                 return;
             }
         }
-    }*/
+    }
 
     private static void checkTermPrime3Production(String[] stk, List<String[]> dataTable) {
         removeEmptyValuesInBetween(stk);
@@ -633,16 +646,46 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkArithmeticExpressionProduction(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
+    // private static void checkArithmeticExpressionProduction(String[] stk, List<String[]> dataTable) {
+    //     removeEmptyValuesInBetween(stk);
+    //     for (int z = 0; z < stk.length - 1; z++) {
+    //         String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("term") && (stk[z + 1].equals("arithExpPrime"))) {
-                // Perform reduction for identifier
+    //         // Check for producing rule identifier -> id | comet_literal
+    //         if (stk[z].equals("term") && (stk[z + 1].equals("arithExpPrime"))) {
+    //             // Perform reduction for identifier
+    //             stk[z] = "arithExp";
+    //             stk[z + 1] = "";
+                
+    //             // Add reduction to dataTable
+    //             dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+    //             return;
+    //         }
+    //     }
+    // }
+
+    private static void checkArithmeticExpressionProductionTemp(String[] stk, List<String[]> dataTable) {
+        removeEmptyValuesInBetween(stk);
+        for (int z = 0; z < stk.length - 2; z++) {
+            String original = constructOriginalString(stk, z);
+            if (stk[z].equals("term") &&
+                ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))) &&
+                stk[z + 2].equals("factor")) {
                 stk[z] = "arithExp";
                 stk[z + 1] = "";
+                stk[z + 2] = "";
+                
+                // Add reduction to dataTable
+                dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+                return;
+            }
+
+            if (stk[z].equals("identifier") &&
+                ((stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div"))) &&
+                stk[z + 2].equals("factor")) {
+                stk[z] = "arithExp";
+                stk[z + 1] = "";
+                stk[z + 2] = "";
                 
                 // Add reduction to dataTable
                 dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
@@ -650,6 +693,7 @@ public class ProductionChecker {
             }
         }
     }
+    // END OF ARITMETIC 
 
     private static void checkNavigateProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);

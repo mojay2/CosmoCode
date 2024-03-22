@@ -4,7 +4,7 @@ Whirl ( var2 <= var1 ) {
     transmission ( "hello" ) ;
 } ;
 Launch {
-    transmission ( "Greater!" ) ;
+    x = x + y ;
 } Whirl ( var2 != 0 && var1 < 2 ) ;
 Orbit ( var1 > var2 ) {
     transmission ( "Greater!" ) ;
