@@ -99,7 +99,6 @@ public class ProductionChecker {
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
-                System.out.println("AHHH: ");
                 root.logTree();
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("comet_literal");
