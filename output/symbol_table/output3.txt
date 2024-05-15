@@ -2,7 +2,6 @@ Symbol Table:
 && : and
 || : or
 <= : less_eq
-result : id_result
 transmission : transmission_token
 Propel : propel_token
 reception : reception_token
@@ -10,6 +9,7 @@ reception : reception_token
 -- : decr
 == : eq
 Orbit : orbit_token
+e : id_e
 ( : op_par
 Whirl : whirl_token
 ) : cl_par
@@ -22,7 +22,6 @@ Launch : launchwhirl_token
 / : div
 Comet : comet_token
 x : id_x
-y : id_y
 Navigate : navigate_token
 { : op_brac
 ; : semicolon

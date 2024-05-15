@@ -1,1 +1,10 @@
-Parse tree cannot be generated for the given input
+Program 3
+|____decStmt
+|____|____comet_token
+|____|____identifier
+|____|____|____id_e
+|____|____arith_assign
+|____|____identifier
+|____|____|____id_x
+|____|____sep_semicolon
+

@@ -1,32 +1,5 @@
 comet_token
 id_x
 arith_assign
-comet_5
-sep_semicolon
-comet_token
-id_y
-arith_assign
-comet_10
-sep_semicolon
-orbit_token
-sep_op_par
-id_result
-comp_less_eq
-comet_15
-sep_cl_par
-sep_op_brac
-transmission_token
-sep_op_par
-"Result is less than or equal to 15"
-sep_cl_par
-sep_semicolon
-sep_cl_brac
-propel_token
-sep_op_brac
-transmission_token
-sep_op_par
-"Result is greater than 15"
-sep_cl_par
-sep_semicolon
-sep_cl_brac
+cmt_5
 sep_semicolon

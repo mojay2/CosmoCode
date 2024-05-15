@@ -22,8 +22,6 @@ Voyage : voyage_token
 Launch : launchwhirl_token
 / : div
 Comet : comet_token
-x : id_x
-y : id_y
 Navigate : navigate_token
 { : op_brac
 ; : semicolon

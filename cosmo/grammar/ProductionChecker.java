@@ -1,6 +1,7 @@
 package cosmo.grammar;
 
 import cosmo.ParseTreeNode;
+import cosmo.Interpreter;
 import java.util.*;
 
 public class ProductionChecker {
@@ -66,15 +67,15 @@ public class ProductionChecker {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
-
+    
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].startsWith("id_")) {
+            if (stk[z].startsWith("id_")) {   
                 // Perform reduction for identifier
                 stk[z] = "identifier";
-
+    
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
+    
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("identifier");
@@ -91,7 +92,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].startsWith("comet_") && !stk[z].startsWith("comet_token")) {
+            if (stk[z].startsWith("cmt_")) {
                 // Perform reduction for identifier
                 stk[z] = "comet_literal";
 
@@ -99,7 +100,7 @@ public class ProductionChecker {
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
-                root.logTree();
+                //root.logTree();
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("comet_literal");
                 reducedNode.addChild(previousNode);
@@ -112,7 +113,7 @@ public class ProductionChecker {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
-
+    
             // Check for producing rule decStmt -> comet_token id arith_assign
             if (stk[z].equals("comet_token") &&
                     stk[z + 1].equals("identifier") &&
@@ -121,12 +122,13 @@ public class ProductionChecker {
                             || stk[z + 3].equals("arithExp"))
                     &&
                     stk[z + 4].equals("sep_semicolon")) {
-                // Perform reduction for identifier
-                stk[z] = "decStmt";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-                stk[z + 3] = "";
-                stk[z + 4] = "";
+                
+                        // Perform reduction for decStmt
+                        stk[z] = "decStmt";
+                        stk[z + 1] = "";
+                        stk[z + 2] = "";
+                        stk[z + 3] = "";
+                        stk[z + 4] = "";
 
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
@@ -138,10 +140,10 @@ public class ProductionChecker {
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("decStmt");
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 
