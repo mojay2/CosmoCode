@@ -7,5 +7,3 @@ transmission ( "Helllo World! :D" ) ;
 var2 = 5 ;
 var1 = reception ( "Enter value for var1: " ) ;
 var3 = reception ( "Enter value for var3: " ) ;
-
-

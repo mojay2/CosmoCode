@@ -85,6 +85,9 @@ public class Parser {
         // Check stack for production rules after adding the last token
         check(stk, dataTable, root, valueTable);
 
+        // Check stack for production rules after adding the last token for arithmetic
+        check(stk, dataTable, root, valueTable);
+
         // Check if the stack contains only valid tokens
         boolean isValidInput = true;
         String[] validTokens = { "decStmt", "expr", "orbitStmt", "whirlLoop", "launchWhirlLoop" };
@@ -112,7 +115,7 @@ public class Parser {
             }
         }
 
-        //System.out.println("CHECK: " + Arrays.toString(filteredStk));
+        // System.out.println("CHECK: " + Arrays.toString(filteredStk));
 
         if (!isValidInput) {
             ArrayList<String> list = new ArrayList<>();
@@ -122,7 +125,7 @@ public class Parser {
             }
             list = checkProds(list);
             list = retrieveValidTokens(list);
-            //System.out.println(list);
+            // System.out.println(list);
             if (list.get(0).equals("arithExp") && list.size() == 1) {
                 isValidInput = true;
             }
@@ -172,7 +175,7 @@ public class Parser {
                 }
                 writer.append("\n");
             }
-            //System.out.println("CSV file has been created successfully!");
+            // System.out.println("CSV file has been created successfully!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -184,7 +187,7 @@ public class Parser {
                 writer.write(entry.getKey() + " : " + entry.getValue());
                 writer.newLine();
             }
-            //System.out.println("Value table has been written to " + fileName);
+            // System.out.println("Value table has been written to " + fileName);
         } catch (IOException e) {
             System.err.println("Error writing value table to file: " + e.getMessage());
         }
