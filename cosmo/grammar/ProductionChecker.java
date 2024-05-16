@@ -705,12 +705,10 @@ public class ProductionChecker {
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("propelStmt");
-                reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
-                root.addChild(previousNode);
 
                 return;
             }
@@ -741,7 +739,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode2 = root.popChild();
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt1");
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
@@ -780,7 +778,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt2");
                 reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
@@ -823,7 +821,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
                 ParseTreeNode previousNode6 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt3");
                 reducedNode.addChild(previousNode6);
                 reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);

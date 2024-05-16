@@ -1,9 +1,16 @@
 Comet var2 = 3 ; 
 Comet var1 = var2 ; 
+Comet var3 = 6 ; 
 var1 = 4 ;
 var2 = 5 ;
 transmission ( var2 ) ; 
 transmission ( "Helllo World! :D" ) ; 
-var2 = 5 ;
-var1 = reception ( "Enter value for var1: " ) ;
-var3 = reception ( "Enter value for var3: " ) ;
+
+
+Orbit ( var2 <= 0 || var3 == 5 ) {
+    transmission ( "This is for orbit" ) ;
+} Navigate ( var1 == 4 ) {
+    transmission ( "This is for navigate" ) ;
+} Propel {
+    transmission ( "This is for propel" ) ;
+} ;

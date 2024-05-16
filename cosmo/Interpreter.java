@@ -1,6 +1,7 @@
 package cosmo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class Interpreter {   
@@ -17,6 +18,15 @@ public class Interpreter {
                     interpret(child, valueTable);
                 }
                 break;
+            case "orbitStmt1":
+                orbit(root, valueTable);
+                break;
+            case "orbitStmt2":
+                orbitPropel(root, valueTable);
+                break;
+            case "orbitStmt3":
+                orbitNavigatePropel(root, valueTable);
+                break;
             case "decStmt":
                 declaration(root, valueTable);
                 break;
@@ -29,6 +39,8 @@ public class Interpreter {
             case "receptionStmt":
                 reception(root, valueTable);
                 break;
+           
+            
             // Add more cases for other statement types
             default:
                 for (ParseTreeNode child : root.getChildren()) {
@@ -199,6 +211,419 @@ public class Interpreter {
                 }
             } else {
                 System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
+            }
+        }
+    }  
+
+    private static Boolean logical(ParseTreeNode node, HashMap<String, String> valueTable) {
+        Boolean leftValue = null;
+        Boolean rightValue = null;
+        String operator = null;
+        Boolean result = null;
+    
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "relationalExp":
+                    if (leftValue == null) {
+                        leftValue = relational(child, valueTable);
+                    } else {
+                        rightValue = relational(child, valueTable);
+                    }
+                    break;
+                case "logicalOp":
+                    operator = getLeafValue(child);
+                    
+            }
+        }
+
+        if (operator.equals("logic_and")) {
+            result = leftValue && rightValue;
+        } else if (operator.equals("logic_or")) {
+            result = leftValue || rightValue;
+        }
+        return result;
+    }
+
+    private static Boolean relational(ParseTreeNode node, HashMap<String, String> valueTable) {
+        String leftValue = null;
+        String rightValue = null;
+        String operator = null;
+    
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    String identifier = getLeafValue(child);
+                    if (leftValue == null) {
+                        leftValue = valueTable.get(identifier);
+                    } else {
+                        rightValue = valueTable.get(identifier);
+                        
+                    }
+                    break;
+                case "comet_literal":
+                    String literal = getLeafValue(child);
+                    if (leftValue == null) {
+                        leftValue = literal;
+                    } else {
+                        rightValue = literal;
+                    }
+                    break;
+                case "relationalOp":
+                    operator = getLeafValue(child);
+                    break;
+            }
+        }
+    
+        if (leftValue == null || rightValue == null || operator == null) {
+            throw new IllegalStateException("Invalid relational expression");
+        }
+    
+        double left = Double.parseDouble(leftValue);
+        double right = Double.parseDouble(rightValue);
+    
+        switch (operator) {
+            case "comp_not":
+                return left != right;
+            case "comp_less":
+                return left < right;
+            case "comp_less_eq":
+                return left <= right;
+            case "comp_great":
+                return left > right;
+            case "comp_great_eq":
+                return left >= right;
+            case "comp_eq":
+                return left == right;
+            default:
+                throw new IllegalStateException("Unknown relational operator: " + operator);
+        }
+    }
+    private static void orbitCheckConditional(ParseTreeNode node, HashMap<String, String> valueTable) {}
+
+    private static void orbit(ParseTreeNode node, HashMap<String, String> valueTable) {
+        boolean condition = true;
+    
+        // Check condition first
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "conditionalExp":
+                    for (ParseTreeNode condChild : child.getChildren()) { // Iterate over children of conditionalExp
+                        switch (condChild.getSymbol()) {
+                            case "logicalExp":
+                                condition = logical(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break;
+                            case "relationalExp":
+                                condition = relational(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break; 
+                        }
+                    }
+                    break; // You should break out of the outer loop after processing the conditionalExp
+            }
+        }
+    
+        System.out.println("Orbit FINAL CONDITION: " + condition);
+    
+        // If condition is true, execute the statements
+        if (condition) {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "stmt":
+                        for (ParseTreeNode stmtChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (stmtChild.getSymbol()) {
+                                case "expr":
+                                    for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                        switch (exprChild.getSymbol()) {
+                                            case "decStmt":
+                                                declaration(exprChild, valueTable);
+                                                break;
+                                            case "assignStmt":
+                                                assignment(exprChild, valueTable);
+                                                break;
+                                            case "transmissionStmt":
+                                                transmission(exprChild, valueTable);
+                                                break;
+                                            case "receptionStmt":
+                                                reception(exprChild, valueTable);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void orbitPropel(ParseTreeNode node, HashMap<String, String> valueTable) {
+        boolean condition = true;
+        String identifier = null;
+        String value = null;
+    
+        // Check condition first
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "conditionalExp":
+                    for (ParseTreeNode condChild : child.getChildren()) { // Iterate over children of conditionalExp
+                        switch (condChild.getSymbol()) {
+                            case "logicalExp":
+                                condition = logical(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break;
+                            case "relationalExp":
+                                condition = relational(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break; 
+                        }
+                    }
+                    break; // You should break out of the outer loop after processing the conditionalExp
+            }
+        }
+    
+        System.out.println("OrbitPropel FINAL CONDITION: " + condition);
+    
+        // If condition is true, execute the statements
+        if (condition) {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "stmt":
+                        for (ParseTreeNode stmtChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (stmtChild.getSymbol()) {
+                                case "expr":
+                                    for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                        switch (exprChild.getSymbol()) {
+                                            case "decStmt":
+                                                declaration(exprChild, valueTable);
+                                                break;
+                                            case "assignStmt":
+                                                assignment(exprChild, valueTable);
+                                                break;
+                                            case "transmissionStmt":
+                                                transmission(exprChild, valueTable);
+                                                break;
+                                            case "receptionStmt":
+                                                reception(exprChild, valueTable);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        } else {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "propelStmt":
+                        for (ParseTreeNode propelChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (propelChild.getSymbol()) {
+                                case "stmt":
+                                    for (ParseTreeNode stmtChild : propelChild.getChildren()) { // Iterate over children of expr
+                                        switch (stmtChild.getSymbol()) {
+                                            case "expr":
+                                                for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                                    switch (exprChild.getSymbol()) {
+                                                        case "decStmt":
+                                                            declaration(exprChild, valueTable);
+                                                            break;
+                                                        case "assignStmt":
+                                                            assignment(exprChild, valueTable);
+                                                            break;
+                                                        case "transmissionStmt":
+                                                            transmission(exprChild, valueTable);
+                                                            break;
+                                                        case "receptionStmt":
+                                                            reception(exprChild, valueTable);
+                                                            break;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+    
+    private static void orbitNavigatePropel(ParseTreeNode node, HashMap<String, String> valueTable) {
+        boolean condition = true;
+        boolean condition2 = true;
+        String identifier = null;
+        String value = null;
+    
+        // Check condition first
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "conditionalExp":
+                    for (ParseTreeNode condChild : child.getChildren()) { // Iterate over children of conditionalExp
+                        switch (condChild.getSymbol()) {
+                            case "logicalExp":
+                                condition = logical(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break;
+                            case "relationalExp":
+                                condition = relational(condChild, valueTable);
+                                if (!condition) {
+                                    // If condition becomes false, no need to check further
+                                    break;
+                                }
+                                break; 
+                        }
+                    }
+                    break; // You should break out of the outer loop after processing the conditionalExp
+                case "navigateStmt":
+                    for (ParseTreeNode navChild : child.getChildren()) { // Iterate over children of conditionalExp
+                        switch (navChild.getSymbol()) {
+                            case "conditionalExp":
+                                for (ParseTreeNode condChild : child.getChildren()) { // Iterate over children of conditionalExp
+                                    switch (condChild.getSymbol()) {
+                                        case "logicalExp":
+                                            condition2 = logical(condChild, valueTable);
+                                            if (!condition2) {
+                                                // If condition becomes false, no need to check further
+                                                break;
+                                            }
+                                            break;
+                                        case "relationalExp":
+                                            condition = relational(condChild, valueTable);
+                                            if (!condition2) {
+                                                // If condition becomes false, no need to check further
+                                                break;
+                                            }
+                                            break; 
+                                    }
+                                }
+                        }
+                    }
+                    break; // You should break out of the outer loop after processing the conditionalExp
+            }
+        }
+    
+        System.out.println("OrbitNavigatePropel ORBIT CONDITION: " + condition);
+        System.out.println("OrbitNavigatePropel NAVIGATE CONDITION: " + condition2);
+    
+        // If condition is true, execute the statements
+        if (condition) {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "stmt":
+                        for (ParseTreeNode stmtChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (stmtChild.getSymbol()) {
+                                case "expr":
+                                    for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                        switch (exprChild.getSymbol()) {
+                                            case "decStmt":
+                                                declaration(exprChild, valueTable);
+                                                break;
+                                            case "assignStmt":
+                                                assignment(exprChild, valueTable);
+                                                break;
+                                            case "transmissionStmt":
+                                                transmission(exprChild, valueTable);
+                                                break;
+                                            case "receptionStmt":
+                                                reception(exprChild, valueTable);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        } else if (condition2) {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "navigateStmt":
+                        for (ParseTreeNode navChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (navChild.getSymbol()) {
+                                case "stmt":
+                                    for (ParseTreeNode stmtChild : navChild.getChildren()) { // Iterate over children of expr
+                                        switch (stmtChild.getSymbol()) {
+                                            case "expr":
+                                                for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                                    switch (exprChild.getSymbol()) {
+                                                        case "decStmt":
+                                                            declaration(exprChild, valueTable);
+                                                            break;
+                                                        case "assignStmt":
+                                                            assignment(exprChild, valueTable);
+                                                            break;
+                                                        case "transmissionStmt":
+                                                            transmission(exprChild, valueTable);
+                                                            break;
+                                                        case "receptionStmt":
+                                                            reception(exprChild, valueTable);
+                                                            break;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        } else {
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "propelStmt":
+                        for (ParseTreeNode propelChild : child.getChildren()) { // Iterate over children of stmt
+                            switch (propelChild.getSymbol()) {
+                                case "stmt":
+                                    for (ParseTreeNode stmtChild : propelChild.getChildren()) { // Iterate over children of expr
+                                        switch (stmtChild.getSymbol()) {
+                                            case "expr":
+                                                for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                                    switch (exprChild.getSymbol()) {
+                                                        case "decStmt":
+                                                            declaration(exprChild, valueTable);
+                                                            break;
+                                                        case "assignStmt":
+                                                            assignment(exprChild, valueTable);
+                                                            break;
+                                                        case "transmissionStmt":
+                                                            transmission(exprChild, valueTable);
+                                                            break;
+                                                        case "receptionStmt":
+                                                            reception(exprChild, valueTable);
+                                                            break;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
             }
         }
     }

@@ -1,2 +1,14 @@
-Comet x = 5 ;
+Comet var2 = 3 ; 
+Comet var1 = var2 ; 
+Comet var3 = 6 ; 
+var1 = 4 ;
+var2 = 5 ;
+transmission ( var2 ) ; 
+transmission ( "Helllo World! :D" ) ; 
 
+
+Orbit ( var2 <= 0 || var3 == 5 ) {
+    transmission ( "This is for orbit" ) ;
+} Propel {
+    transmission ( "This is for propel" ) ;
+} ;
