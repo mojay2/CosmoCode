@@ -90,7 +90,7 @@ public class Parser {
 
         // Check if the stack contains only valid tokens
         boolean isValidInput = true;
-        String[] validTokens = { "decStmt", "expr", "orbitStmt", "whirlLoop", "launchWhirlLoop" };
+        String[] validTokens = { "decStmt", "expr", "orbitStmt1", "orbitStmt2", "orbitStmt3", "whirlLoop", "launchWhirlLoop" };
 
         // Filter out empty strings from the stack
         List<String> filteredStack = Arrays.stream(stk)

@@ -317,39 +317,70 @@ public class ProductionChecker {
     }
 
     private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
+    removeEmptyValuesInBetween(stk);
 
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
+    boolean reduced = false;
 
-            // Check if the current sequence matches the production rule
-            // <logicalExp> -> <relationalExp> <logicalOp> <relationalExp>
-            if (stk[z].equals("relationalExp") && stk[z + 1].equals("logicalOp")
-                    && stk[z + 2].equals("relationalExp")) {
-                // Perform reduction for identifier
-                stk[z] = "logicalExp";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
+    for (int z = 0; z < stk.length - 2; z++) {
+        String original = constructOriginalString(stk, z);
 
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " +
-                        original, "", "" });
+        // Check if the current sequence matches the production rule
+        // <logicalExp> -> <relationalExp> <logicalOp> <relationalExp>
+        if (stk[z].equals("relationalExp") && stk[z + 1].equals("logicalOp") && stk[z + 2].equals("relationalExp")) {
+            // Perform reduction for identifier
+            stk[z] = "logicalExp";
+            stk[z + 1] = "";
+            stk[z + 2] = "";
 
-                // Update Parse Tree
-                ParseTreeNode closePar = root.popChild();
-                ParseTreeNode relationalExp = root.popChild();
-                ParseTreeNode logicalOp = root.popChild();
-                ParseTreeNode relationalExp2 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
-                reducedNode.addChild(relationalExp2);
-                reducedNode.addChild(logicalOp);
-                reducedNode.addChild(relationalExp);
-                root.addChild(reducedNode);
-                root.addChild(closePar);
-                return;
-            }
+            // Add reduction to dataTable
+            dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+
+            // Update Parse Tree
+            ParseTreeNode relationalExp2 = root.popChild();
+            ParseTreeNode logicalOp = root.popChild();
+            ParseTreeNode relationalExp = root.popChild();
+            ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
+            reducedNode.addChild(relationalExp);
+            reducedNode.addChild(logicalOp);
+            reducedNode.addChild(relationalExp2);
+            root.addChild(reducedNode);
+
+            reduced = true;
+            break;
+        }
+
+        // Check if the current sequence matches the extended production rule
+        // <logicalExp> -> <logicalExp> <logicalOp> <relationalExp>
+        if (stk[z].equals("logicalExp") && stk[z + 1].equals("logicalOp") && stk[z + 2].equals("relationalExp")) {
+            // Perform reduction for identifier
+            stk[z] = "logicalExp";
+            stk[z + 1] = "";
+            stk[z + 2] = "";
+
+            // Add reduction to dataTable
+            dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", ""});
+
+            // Update Parse Tree
+            ParseTreeNode relationalExp2 = root.popChild();
+            ParseTreeNode logicalOp = root.popChild();
+            ParseTreeNode logicalExp = root.popChild();
+            ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
+            reducedNode.addChild(logicalExp);
+            reducedNode.addChild(logicalOp);
+            reducedNode.addChild(relationalExp2);
+            root.addChild(reducedNode);
+
+            reduced = true;
+            break;
         }
     }
+
+    // If a reduction was made, remove the empty values and check again
+    if (reduced) {
+        removeEmptyValuesInBetween(stk);
+        checkLogicalExpressionProduction(stk, dataTable, root);
+    }
+}
 
     private static void checkRelationalExpressionProduction(String[] stk, List<String[]> dataTable,
             ParseTreeNode root) {
@@ -727,7 +758,7 @@ public class ProductionChecker {
                     stk[z + 2].equals("stmt") &&
                     stk[z + 3].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt1";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
@@ -764,7 +795,7 @@ public class ProductionChecker {
                     stk[z + 3].equals("propelStmt") &&
                     stk[z + 4].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt2";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
@@ -805,7 +836,7 @@ public class ProductionChecker {
                     stk[z + 4].equals("propelStmt") &&
                     stk[z + 5].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt3";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
