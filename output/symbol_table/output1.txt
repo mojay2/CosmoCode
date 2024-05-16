@@ -4,6 +4,7 @@ Symbol Table:
 <= : less_eq
 transmission : transmission_token
 Propel : propel_token
+var3 : id_var3
 reception : reception_token
 var2 : id_var2
 var1 : id_var1

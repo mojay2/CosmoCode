@@ -1,6 +1,7 @@
 package cosmo;
 
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Interpreter {   
     
@@ -24,6 +25,9 @@ public class Interpreter {
                 break;
             case "transmissionStmt":
                 transmission(root, valueTable);
+                break;
+            case "receptionStmt":
+                reception(root, valueTable);
                 break;
             // Add more cases for other statement types
             default:
@@ -80,10 +84,10 @@ public class Interpreter {
                     valueTable.put(identifier, assignedValue);
                     System.out.println("Declaration: " + identifier + " = " + assignedValue);
                 } else {
-                    System.out.println("ERROR: " + value + " has not yet been been declared.");
+                    System.out.println("DECLARATION ERROR: " + value + " has not yet been been declared.");
                 }
             } else {
-                System.out.println("ERROR: " + identifier + " has already been declared.");
+                System.out.println("DECLARATION ERROR: " + identifier + " has already been declared.");
             }
         }
     }
@@ -118,10 +122,10 @@ public class Interpreter {
                     valueTable.put(identifier, assignedValue);
                     System.out.println("Assignment: " + identifier + " = " + assignedValue);
                 } else {
-                    System.out.println("ERROR: " + value + " has not yet been been declared.");
+                    System.out.println("ASSIGNMENT ERROR: " + value + " has not yet been been declared.");
                 }
             } else {
-                System.out.println("ERROR: " + identifier + " has not yet been declared.");
+                System.out.println("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
             }
         }
     }
@@ -130,21 +134,15 @@ public class Interpreter {
         String value = null;
     
         for (ParseTreeNode child : node.getChildren()) {
-            if (child.getSymbol().equals("ioStmt")) {
-                // Process the children of the ioStmt node
-                for (ParseTreeNode ioChild : child.getChildren()) {
-                    String ioChildSymbol = ioChild.getSymbol();
-                    switch (ioChildSymbol) {
-                        case "identifier":
-                            value = getLeafValue(ioChild);
-                            break;
-                        case "string":
-                            // Handle string
-                            value = getLeafValue(ioChild);
-                            value = value.replace("\"", "");
-                            break;
-                    }
-                }
+            switch (child.getSymbol()) {
+                case "identifier":
+                    value = getLeafValue(child);
+                    break;
+                case "string":
+                    // Handle string
+                    value = getLeafValue(child);
+                    value = value.replace("\"", "");
+                    break;
             }
         }
 
@@ -154,6 +152,53 @@ public class Interpreter {
                 System.out.println("Transmission: " + assignedValue);
             } else {
                 System.out.println("Transmission: " + value);
+            }
+        }
+    }
+
+    private static void reception(ParseTreeNode node, HashMap<String, String> valueTable) {
+        String statement = null;
+        String identifier = null;
+        String value = null;
+
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    identifier = getLeafValue(child);
+                    if (valueTable.containsKey(identifier)) {
+                        identifier = getLeafValue(child);
+                    } else {
+                        System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
+                    }
+                    break;
+                case "string":
+                    statement = getLeafValue(child);
+                    statement = statement.replace("\"", "");
+                    break;
+            }
+        }
+
+        
+        try (Scanner myObj = new Scanner(System.in)) {
+            if (valueTable.containsKey(identifier)) {
+                System.out.print(statement); // Print user prompt
+                value = myObj.nextLine();  // Read user input
+
+            }
+        }
+        
+        
+        if (identifier != null && value != null) {
+            if (valueTable.containsKey(identifier)) {
+                if (value.matches("-?\\d+(\\.\\d+)?")) {
+                    valueTable.put(identifier, value);
+                    System.out.println("Reception: " + identifier + " = " + value);
+                    identifier = value;
+                } else {
+                    System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
+                }
+            } else {
+                System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
             }
         }
     }

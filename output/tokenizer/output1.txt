@@ -26,3 +26,21 @@ sep_op_par
 "Helllo World! :D"
 sep_cl_par
 sep_semicolon
+id_var2
+arith_assign
+cmt_5
+sep_semicolon
+id_var1
+arith_assign
+reception_token
+sep_op_par
+"Enter value for var1: "
+sep_cl_par
+sep_semicolon
+id_var3
+arith_assign
+reception_token
+sep_op_par
+"Enter value for var3: "
+sep_cl_par
+sep_semicolon
