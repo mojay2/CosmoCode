@@ -135,12 +135,12 @@ public class Parser {
                 System.out.println("Accept");
                 dataTable.add(new String[] { "ACCEPT", "", "" });
                 out.println(treeString);
+                Interpreter.interpret(root, valueTable);
             } else {
                 System.out.println("Reject");
                 dataTable.add(new String[] { "REJECT", "", "" });
                 out.println("Parse tree cannot be generated for the given input");
             }
-            Interpreter.interpret(root, valueTable);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
