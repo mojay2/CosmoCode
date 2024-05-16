@@ -7,6 +7,6 @@ transmission ( var2 ) ;
 transmission ( "Helllo World! :D" ) ; 
 
 
-Orbit ( var2 <= 0 || var3 == 5 ) {
+Orbit ( var2 >= 0 || var3 == 5 ) {
     transmission ( "This is for orbit" ) ;
 } ;

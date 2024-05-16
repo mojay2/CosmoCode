@@ -34,7 +34,7 @@ sep_semicolon
 orbit_token
 sep_op_par
 id_var2
-comp_less_eq
+comp_great_eq
 cmt_0
 logic_or
 id_var3
