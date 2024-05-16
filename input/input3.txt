@@ -6,7 +6,12 @@ var2 = 5 ;
 transmission ( var2 ) ; 
 transmission ( "Helllo World! :D" ) ; 
 
-
-Orbit ( var2 >= 0 || var3 == 5 ) {
-    transmission ( "This is for orbit" ) ;
+Whirl ( var2 > 2 ) {
+    transmission ( "Helllo World! :D" ) ; 
+    var2 = 1 ;
 } ;
+
+Launch {
+    transmission ( "Helllo Worldswsws! :D" ) ; 
+    var1 = 1 ;
+} Whirl ( var1 > 2 ) ;

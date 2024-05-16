@@ -31,21 +31,40 @@ sep_op_par
 "Helllo World! :D"
 sep_cl_par
 sep_semicolon
-orbit_token
+whirl_token
 sep_op_par
 id_var2
-comp_great_eq
-cmt_0
-logic_or
-id_var3
-comp_eq
-cmt_5
+comp_great
+cmt_2
 sep_cl_par
 sep_op_brac
 transmission_token
 sep_op_par
-"This is for orbit"
+"Helllo World! :D"
 sep_cl_par
 sep_semicolon
+id_var2
+arith_assign
+cmt_1
+sep_semicolon
 sep_cl_brac
+sep_semicolon
+launchwhirl_token
+sep_op_brac
+transmission_token
+sep_op_par
+"Helllo Worldswsws! :D"
+sep_cl_par
+sep_semicolon
+id_var1
+arith_assign
+cmt_1
+sep_semicolon
+sep_cl_brac
+whirl_token
+sep_op_par
+id_var1
+comp_great
+cmt_2
+sep_cl_par
 sep_semicolon
