@@ -2,6 +2,7 @@ Comet var2 = 3 ;
 Comet var1 = var2 ; 
 var1 = 4 ;
 var2 = 5 ;
-var3 = 6 ;
+transmission ( var2 ) ; 
+transmission ( "Helllo World! :D" ) ; 
 
 

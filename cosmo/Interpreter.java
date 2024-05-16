@@ -22,6 +22,9 @@ public class Interpreter {
             case "assignStmt":
                 assignment(root, valueTable);
                 break;
+            case "transmissionStmt":
+                transmission(root, valueTable);
+                break;
             // Add more cases for other statement types
             default:
                 for (ParseTreeNode child : root.getChildren()) {
@@ -108,17 +111,49 @@ public class Interpreter {
             if (valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
                     valueTable.put(identifier, value);
-                    System.out.println("Declaration: " + identifier + " = " + value);
+                    System.out.println("Assignment: " + identifier + " = " + value);
                     identifier = value;
                 } else if (valueTable.containsKey(value)) {
                     String assignedValue = valueTable.get(value);
                     valueTable.put(identifier, assignedValue);
-                    System.out.println("Declaration: " + identifier + " = " + assignedValue);
+                    System.out.println("Assignment: " + identifier + " = " + assignedValue);
                 } else {
                     System.out.println("ERROR: " + value + " has not yet been been declared.");
                 }
             } else {
                 System.out.println("ERROR: " + identifier + " has not yet been declared.");
+            }
+        }
+    }
+
+    private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable) {
+        String value = null;
+    
+        for (ParseTreeNode child : node.getChildren()) {
+            if (child.getSymbol().equals("ioStmt")) {
+                // Process the children of the ioStmt node
+                for (ParseTreeNode ioChild : child.getChildren()) {
+                    String ioChildSymbol = ioChild.getSymbol();
+                    switch (ioChildSymbol) {
+                        case "identifier":
+                            value = getLeafValue(ioChild);
+                            break;
+                        case "string":
+                            // Handle string
+                            value = getLeafValue(ioChild);
+                            value = value.replace("\"", "");
+                            break;
+                    }
+                }
+            }
+        }
+
+        if (value != null) {
+            if (valueTable.containsKey(value)) {
+                String assignedValue = valueTable.get(value);
+                System.out.println("Transmission: " + assignedValue);
+            } else {
+                System.out.println("Transmission: " + value);
             }
         }
     }
