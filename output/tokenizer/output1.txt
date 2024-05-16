@@ -8,3 +8,15 @@ id_var1
 arith_assign
 id_var2
 sep_semicolon
+id_var1
+arith_assign
+cmt_4
+sep_semicolon
+id_var2
+arith_assign
+cmt_5
+sep_semicolon
+id_var3
+arith_assign
+cmt_6
+sep_semicolon
