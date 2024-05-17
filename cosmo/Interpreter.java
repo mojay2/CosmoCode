@@ -414,16 +414,22 @@ public class Interpreter {
 
         switch (operator) {
             case "comp_not":
+                System.out.println("REL: " + left + " != " + right + " RESULT: " + (left != right));
                 return left != right;
             case "comp_less":
+                System.out.println("REL: " + left + " < " + right + " RESULT: " + (left < right));
                 return left < right;
             case "comp_less_eq":
+                System.out.println("REL: " + left + " <= " + right + " RESULT: " + (left <= right));
                 return left <= right;
             case "comp_great":
+                System.out.println("REL: " + left + " > " + right + " RESULT: " + (left > right));
                 return left > right;
             case "comp_great_eq":
+                System.out.println("REL: " + left + " >= " + right + " RESULT: " + (left >= right));
                 return left >= right;
             case "comp_eq":
+                System.out.println("REL: " + left + " == " + right + " RESULT: " + (left == right));
                 return left == right;
             default:
                 throw new IllegalStateException("Unknown relational operator: " + operator);
@@ -543,7 +549,7 @@ public class Interpreter {
                     for (ParseTreeNode navChild : child.getChildren()) { // Iterate over children of conditionalExp
                         switch (navChild.getSymbol()) {
                             case "conditionalExp":
-                                condition2 = conditionProcessor(condition, child, valueTable);
+                                condition2 = conditionProcessor(condition, navChild, valueTable);
                         }
                     }
                     break; // You should break out of the outer loop after processing the conditionalExp
