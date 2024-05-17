@@ -17,18 +17,56 @@ public class Tokenizer {
     static int totalErrors = 0;
 
     public void processInputs() {
-        for (int i = 1; i <= 3; i++) {
-            String[] tokens = processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt",
-                    "./output/symbol_table/output" + i + ".txt");
+        Scanner scanner = new Scanner(System.in);
+        boolean continueProcessing = true;
+
+        System.out.println("****************************************");
+        System.out.println("*                                      *");
+        System.out.println("*         Welcome to CosmoCode!        *");
+        System.out.println("*                                      *");
+        System.out.println("****************************************");
+        System.out.println("Press any key to continue...");
+        scanner.nextLine();
+
+        while (continueProcessing) {
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+
+            System.out.println("Please enter an input file to be read:");
+            System.out.println("1. input1.txt");
+            System.out.println("2. input2.txt");
+            System.out.println("3. input3.txt");
+            System.out.println("4. input4.txt");
+
+            int choice = scanner.nextInt();
+
+            String[] tokens = processInput("./input/input" + choice + ".txt",
+                    "./output/tokenizer/output" + choice + ".txt",
+                    "./output/symbol_table/output" + choice + ".txt");
             Parser parser = new Parser(tokens);
-            parser.parse(i); // Invoke the parsing process
+            parser.parse(choice); // Invoke the parsing process
+
+            System.out.println("Would you like to continue? (yes/no)");
+            String continueChoice = scanner.next();
+            continueProcessing = continueChoice.equalsIgnoreCase("yes");
         }
+
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        System.out.println("****************************************");
+        System.out.println("*                                      *");
+        System.out.println("*      Thanks for using CosmoCode!     *");
+        System.out.println("*                                      *");
+        System.out.println("****************************************");
+
+        scanner.close();
     }
 
     public String[] processInput(String inputPath, String outputPath, String symbolTablePath) {
         String input = readInput(inputPath);
         System.out.println("\n=================================================\n");
-        System.out.println("Input from " + inputPath );
+        System.out.println("Input from " + inputPath);
         // System.out.println("Input from " + inputPath + ":\n" + input);
 
         // split into array
