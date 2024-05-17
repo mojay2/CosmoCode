@@ -27,7 +27,7 @@ public class Tokenizer {
 
     public String[] processInput(String inputPath, String outputPath, String symbolTablePath) {
         String input = readInput(inputPath);
-        System.out.println("=================================================");
+        System.out.println("\n=================================================\n");
         // System.out.println("Input from " + inputPath );
         System.out.println("Input from " + inputPath + ":\n" + input);
 
@@ -50,8 +50,9 @@ public class Tokenizer {
         // Write symbol table to file
         writeSymbolTableToFile(symbolTablePath, symbolTable);
 
-        System.out.println("\nTotal number of errors:\n" + totalErrors);
-        System.out.println("=================================================");
+        System.out.println("\nTotal number of tokenizing errors:\n" + totalErrors);
+        System.out.println("\n-------------------------------------------------\r\n" + //
+                                        "\n");
         writeOutputToFile(outputPath, tokenized);
 
         return tokenized;

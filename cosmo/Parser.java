@@ -138,11 +138,16 @@ public class Parser {
             // Print output based on input validity
             if (isValidInput) {
                 System.out.println("Accept");
+                System.out.println("\n-------------------------------------------------\r\n" + //
+                                        "\n");
+                System.out.println("Output:");
                 dataTable.add(new String[] { "ACCEPT", "", "" });
                 out.println(treeString);
                 Interpreter.interpret(root, valueTable, scopes);
             } else {
-                System.out.println("Reject");
+                System.out.println("Reject\n");
+                System.out.println("\n-------------------------------------------------\r\n" + //
+                                        "\n");
                 dataTable.add(new String[] { "REJECT", "", "" });
                 out.println("Parse tree cannot be generated for the given input");
             }

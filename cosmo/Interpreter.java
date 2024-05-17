@@ -126,16 +126,13 @@ public class Interpreter {
             }
         }
       
-        if (value.startsWith("ARITHMETIC ERROR")) {
-            System.out.println(value);
-        } else if (identifier != null && value != null) {
+        if (identifier != null && value != null) {
             // Check if the identifier is already declared in the current scope
             if (!scopes.peek().containsKey(identifier)) {
                 // Check if the value is a valid number or a declared variable
                 if (value.matches("-?\\d+(\\.\\d+)?") || lookupVariable(value, scopes) != null) {
                     scopes.peek().put(identifier, value);
                     valueTable.put(identifier, value);  // Update valueTable
-                    System.out.println("Declaration: " + identifier + " = " + value);
                 } else {
                     System.out.println("DECLARATION ERROR: " + value + " has not yet been declared.");
                 }
@@ -202,7 +199,6 @@ public class Interpreter {
                     }
 
                     description = "Arithmetic: " + firstOperand + " " + operator + " " + nextOperand + " = " + result;
-                    System.out.println(description);
 
                     // remove processed operands and operator
                     leaves.remove(i - 1);
@@ -257,7 +253,6 @@ public class Interpreter {
                     System.out.println("Invalid Operator: " + operator + "\n");
             }
             description += operator + " " + nextOperand + " = " + result;
-            System.out.println(description);
         }
 
         return Integer.toString(result);
@@ -285,9 +280,7 @@ public class Interpreter {
             }
         }
 
-        if (value.startsWith("ARITHMETIC ERROR")) {
-            System.out.println(value);
-        } else if (identifier != null && value != null) {
+        if (identifier != null && value != null) {
             // Check if the identifier is declared in any scope
             if (lookupVariable(identifier, scopes) != null) {
                 // Check if the value is a valid number or a declared variable
@@ -297,7 +290,6 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, value);
                             valueTable.put(identifier, value);  // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + value);
                             break;
                         }
                     }
@@ -308,7 +300,6 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, assignedValue);
                             valueTable.put(identifier, assignedValue);  // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + assignedValue);
                             break;
                         }
                     }
@@ -339,14 +330,14 @@ public class Interpreter {
         if (identifier != null) {
             String assignedValue = lookupVariable(identifier, scopes);
             if (assignedValue != null) {
-                System.out.println("Transmission: " + assignedValue);
+                System.out.println(assignedValue);
             } else {
                 System.out.println("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
             }
         }
 
         if (string != null) {
-            System.out.println("Transmission: " + string);
+            System.out.println(string);
         }
     }
     
@@ -381,7 +372,6 @@ public class Interpreter {
                         break;
                     }
                 }
-                System.out.println("Reception: " + identifier + " = " + value);
             } else {
                 System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
             }
@@ -449,14 +439,6 @@ public class Interpreter {
         }
 
         if (leftValue == null || rightValue == null || operator == null) {
-            if (leftValue == null) {
-                System.err.println("Left Value is Null");
-            } else if (rightValue == null) {
-                System.out.println( "left value is " + leftValue);
-                System.err.println("Right Value is Null");
-            } else {
-                System.err.println("Operator is Null");
-            }
             throw new IllegalStateException("Invalid relational expression");
         }
 
@@ -465,22 +447,16 @@ public class Interpreter {
 
         switch (operator) {
             case "comp_not":
-                System.out.println("REL: " + left + " != " + right + " RESULT: " + (left != right));
                 return left != right;
             case "comp_less":
-                System.out.println("REL: " + left + " < " + right + " RESULT: " + (left < right));
                 return left < right;
             case "comp_less_eq":
-                System.out.println("REL: " + left + " <= " + right + " RESULT: " + (left <= right));
                 return left <= right;
             case "comp_great":
-                System.out.println("REL: " + left + " > " + right + " RESULT: " + (left > right));
                 return left > right;
             case "comp_great_eq":
-                System.out.println("REL: " + left + " >= " + right + " RESULT: " + (left >= right));
                 return left >= right;
             case "comp_eq":
-                System.out.println("REL: " + left + " == " + right + " RESULT: " + (left == right));
                 return left == right;
             default:
                 throw new IllegalStateException("Unknown relational operator: " + operator);
