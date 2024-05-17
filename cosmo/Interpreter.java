@@ -39,8 +39,13 @@ public class Interpreter {
             case "receptionStmt":
                 reception(root, valueTable);
                 break;
-           
-            
+            case "whirlLoop":
+                whirl(root, valueTable);
+                break;
+            case "launchWhirlLoop":
+                launchWhirl(root, valueTable);
+                break;
+
             // Add more cases for other statement types
             default:
                 for (ParseTreeNode child : root.getChildren()) {
@@ -64,27 +69,27 @@ public class Interpreter {
         } else {
             return getLeafValue(node.getChildren().get(0));
         }
-    } 
+    }
 
     private static void declaration(ParseTreeNode node, HashMap<String, String> valueTable) {
         String identifier = null;
         String value = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
                     if (identifier == null) {
                         identifier = getLeafValue(child);
                     } else { // the second identifier encountered is the value (the one after the equal sign)
-                        value = getLeafValue(child); 
+                        value = getLeafValue(child);
                     }
                     break;
-                case "comet_literal": 
+                case "comet_literal":
                     value = getLeafValue(child);
-                    break;  
+                    break;
             }
         }
-    
+
         if (identifier != null && value != null) {
             if (!valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
@@ -107,22 +112,22 @@ public class Interpreter {
     private static void assignment(ParseTreeNode node, HashMap<String, String> valueTable) {
         String identifier = null;
         String value = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
                     if (identifier == null) {
                         identifier = getLeafValue(child);
                     } else { // the second identifier encountered is the value (the one after the equal sign)
-                        value = getLeafValue(child); 
+                        value = getLeafValue(child);
                     }
                     break;
-                case "comet_literal": 
+                case "comet_literal":
                     value = getLeafValue(child);
-                    break;  
+                    break;
             }
         }
-    
+
         if (identifier != null && value != null) {
             if (valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
@@ -144,7 +149,7 @@ public class Interpreter {
 
     private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable) {
         String value = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
@@ -199,14 +204,13 @@ public class Interpreter {
             }
         }
     }
-    
 
     private static Boolean logical(ParseTreeNode node, HashMap<String, String> valueTable) {
         Boolean leftValue = null;
         Boolean rightValue = null;
         String operator = null;
         Boolean result = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "relationalExp":
@@ -218,7 +222,7 @@ public class Interpreter {
                     break;
                 case "logicalOp":
                     operator = getLeafValue(child);
-                    
+
             }
         }
 
@@ -234,7 +238,7 @@ public class Interpreter {
         String leftValue = null;
         String rightValue = null;
         String operator = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
@@ -243,7 +247,7 @@ public class Interpreter {
                         leftValue = valueTable.get(identifier);
                     } else {
                         rightValue = valueTable.get(identifier);
-                        
+
                     }
                     break;
                 case "comet_literal":
@@ -259,14 +263,14 @@ public class Interpreter {
                     break;
             }
         }
-    
+
         if (leftValue == null || rightValue == null || operator == null) {
             throw new IllegalStateException("Invalid relational expression");
         }
-    
+
         double left = Double.parseDouble(leftValue);
         double right = Double.parseDouble(rightValue);
-    
+
         switch (operator) {
             case "comp_not":
                 return left != right;
@@ -284,15 +288,16 @@ public class Interpreter {
                 throw new IllegalStateException("Unknown relational operator: " + operator);
         }
     }
-    
-    private static void orbitStatementProcessor(ParseTreeNode node, HashMap<String, String> valueTable) {
+
+    private static void statementProcessor(ParseTreeNode node, HashMap<String, String> valueTable) {
         for (ParseTreeNode child : node.getChildren()) { // Iterate over children of stmt
             switch (child.getSymbol()) {
                 case "stmt":
                     for (ParseTreeNode stmtChild : child.getChildren()) { // Iterate over children of expr
                         switch (stmtChild.getSymbol()) {
                             case "expr":
-                                for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of expr
+                                for (ParseTreeNode exprChild : stmtChild.getChildren()) { // Iterate over children of
+                                                                                          // expr
                                     switch (exprChild.getSymbol()) {
                                         case "decStmt":
                                             declaration(exprChild, valueTable);
@@ -316,7 +321,8 @@ public class Interpreter {
         }
     }
 
-    private static boolean orbitConditionProcessor(Boolean condition, ParseTreeNode node, HashMap<String, String> valueTable) {
+    private static boolean conditionProcessor(Boolean condition, ParseTreeNode node,
+            HashMap<String, String> valueTable) {
         for (ParseTreeNode condChild : node.getChildren()) { // Iterate over children of conditionalExp
             switch (condChild.getSymbol()) {
                 case "logicalExp":
@@ -332,7 +338,7 @@ public class Interpreter {
                         // If condition becomes false, no need to check further
                         break;
                     }
-                    break; 
+                    break;
             }
         }
         return condition;
@@ -340,89 +346,132 @@ public class Interpreter {
 
     private static void orbit(ParseTreeNode node, HashMap<String, String> valueTable) {
         boolean condition = true;
-    
+
         // Check condition first
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "conditionalExp":
-                    condition = orbitConditionProcessor(condition, child, valueTable);
+                    condition = conditionProcessor(condition, child, valueTable);
                     break; // You should break out of the outer loop after processing the conditionalExp
             }
         }
-    
+
         // If condition is true, execute the statements
         if (condition) {
-            orbitStatementProcessor(node, valueTable);
+            statementProcessor(node, valueTable);
         }
     }
 
     private static void orbitPropel(ParseTreeNode node, HashMap<String, String> valueTable) {
         boolean condition = true;
-    
+
         // Check condition first
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "conditionalExp":
-                    condition = orbitConditionProcessor(condition, child, valueTable);
+                    condition = conditionProcessor(condition, child, valueTable);
                     break; // You should break out of the outer loop after processing the conditionalExp
             }
         }
-    
+
         // If condition is true, execute the statements
         if (condition) {
-            orbitStatementProcessor(node, valueTable);
+            statementProcessor(node, valueTable);
         } else {
             for (ParseTreeNode child : node.getChildren()) {
                 switch (child.getSymbol()) {
                     case "propelStmt":
-                        orbitStatementProcessor(child, valueTable);
+                        statementProcessor(child, valueTable);
                         break;
                 }
             }
         }
     }
-    
+
     private static void orbitNavigatePropel(ParseTreeNode node, HashMap<String, String> valueTable) {
         boolean condition = true;
         boolean condition2 = true;
-    
+
         // Check condition first
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "conditionalExp":
-                    condition = orbitConditionProcessor(condition, child, valueTable);
+                    condition = conditionProcessor(condition, child, valueTable);
                     break; // You should break out of the outer loop after processing the conditionalExp
                 case "navigateStmt":
                     for (ParseTreeNode navChild : child.getChildren()) { // Iterate over children of conditionalExp
                         switch (navChild.getSymbol()) {
                             case "conditionalExp":
-                                condition = orbitConditionProcessor(condition, child, valueTable);
+                                condition = conditionProcessor(condition, child, valueTable);
                         }
                     }
                     break; // You should break out of the outer loop after processing the conditionalExp
             }
         }
-    
+
         // If condition is true, execute the statements
         if (condition) {
-            orbitStatementProcessor(node, valueTable);
+            statementProcessor(node, valueTable);
         } else if (condition2) {
             for (ParseTreeNode child : node.getChildren()) {
                 switch (child.getSymbol()) {
                     case "navigateStmt":
-                        orbitStatementProcessor(child, valueTable);
-                        break; 
+                        statementProcessor(child, valueTable);
+                        break;
                 }
             }
         } else {
             for (ParseTreeNode child : node.getChildren()) {
                 switch (child.getSymbol()) {
                     case "propelStmt":
-                        orbitStatementProcessor(child, valueTable);
+                        statementProcessor(child, valueTable);
                         break;
                 }
             }
         }
     }
-    
+
+    private static void whirl(ParseTreeNode node, HashMap<String, String> valueTable) {
+        boolean condition = true;
+        // Check condition first
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "conditionalExp":
+                    condition = conditionProcessor(condition, child, valueTable);
+                    break; // You should break out of the outer loop after processing the conditionalExp
+            }
+        }
+
+        // If condition is true, execute the statements
+        while (condition) {
+            statementProcessor(node, valueTable);
+
+            // Re-evaluate the condition
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "conditionalExp":
+                        condition = conditionProcessor(condition, child, valueTable);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void launchWhirl(ParseTreeNode node, HashMap<String, String> valueTable) {
+        boolean condition = true;
+        do {
+            // Execute the statements
+            statementProcessor(node, valueTable);
+
+            // Evaluate the condition
+            condition = false; // Reset condition
+            for (ParseTreeNode child : node.getChildren()) {
+                switch (child.getSymbol()) {
+                    case "conditionalExp":
+                        condition = conditionProcessor(condition, child, valueTable);
+                        break;
+                }
+            }
+        } while (condition);
+    }
 }
