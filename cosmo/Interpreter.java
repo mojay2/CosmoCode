@@ -165,7 +165,8 @@ public class Interpreter {
                     if (firstLeaf.startsWith("id_")) {
                         String firstOp = lookupVariable(firstLeaf.substring(3), scopes);
                         if (firstOp == null || firstOp == "") {
-                            return firstLeaf.substring(3);
+                            throw new IllegalStateException(
+                                    "ARITHMETIC ERROR: " + firstLeaf.substring(3) + " is not defined.");
                         }
                         firstOperand = Integer.parseInt(firstOp);
                     } else if (firstLeaf.startsWith("cmt_")) {
@@ -180,7 +181,8 @@ public class Interpreter {
                     if (nextLeaf.startsWith("id_")) {
                         String nextOp = lookupVariable(nextLeaf.substring(3), scopes);
                         if (nextOp == null || nextOp == "") {
-                            return nextLeaf.substring(3);
+                            throw new IllegalStateException(
+                                    "ARITHMETIC ERROR: " + nextLeaf.substring(3) + " is not defined.");
                         }
                         nextOperand = Integer.parseInt(nextOp);
                     } else if (nextLeaf.startsWith("cmt_")) {
@@ -196,7 +198,8 @@ public class Interpreter {
                             break;
                         case "arith_div":
                             if (nextOperand == 0) {
-                                return "ARITHMETIC ERROR: Division by Zero";
+                                throw new IllegalStateException(
+                                        "ARITHMETIC ERROR: Division by zero.");
                             }
                             result = firstOperand / nextOperand;
                             break;
@@ -220,7 +223,8 @@ public class Interpreter {
         if (firstLeaf.startsWith("id_")) {
             String resultOp = lookupVariable(firstLeaf.substring(3), scopes);
             if (resultOp == null || resultOp == "") {
-                return firstLeaf.substring(3);
+                throw new IllegalStateException(
+                        "ARITHMETIC ERROR: " + firstLeaf.substring(3) + " is not defined.");
             }
             result = Integer.parseInt(resultOp);
         } else if (firstLeaf.startsWith("id_")) {
@@ -237,7 +241,8 @@ public class Interpreter {
             if (nextLeaf.startsWith("id_")) {
                 String nextOp = lookupVariable(nextLeaf.substring(3), scopes);
                 if (nextOp == null || nextOp == "") {
-                    return nextLeaf.substring(3);
+                    throw new IllegalStateException(
+                            "ARITHMETIC ERROR: " + nextLeaf.substring(3) + " is not defined.");
                 }
                 nextOperand = Integer.parseInt(nextOp);
             } else if (nextLeaf.startsWith("cmt_")) {
