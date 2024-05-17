@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Interpreter {
-
+public class Interpreter {   
+    private static Scanner scanner = new Scanner(System.in);
+    
     public static void interpret(ParseTreeNode root, HashMap<String, String> valueTable) {
         if (root == null) {
             return;
@@ -176,43 +177,30 @@ public class Interpreter {
         String statement = null;
         String identifier = null;
         String value = null;
-
+    
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
                     identifier = getLeafValue(child);
-                    if (valueTable.containsKey(identifier)) {
-                        identifier = getLeafValue(child);
-                    } else {
+                    if (!valueTable.containsKey(identifier)) {
                         System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
                     }
                     break;
                 case "string":
-                    statement = getLeafValue(child);
-                    statement = statement.replace("\"", "");
+                    statement = getLeafValue(child).replace("\"", "");
                     break;
             }
         }
-
-        try (Scanner myObj = new Scanner(System.in)) {
-            if (valueTable.containsKey(identifier)) {
-                System.out.print(statement); // Print user prompt
-                value = myObj.nextLine(); // Read user input
-
-            }
-        }
-
-        if (identifier != null && value != null) {
-            if (valueTable.containsKey(identifier)) {
-                if (value.matches("-?\\d+(\\.\\d+)?")) {
-                    valueTable.put(identifier, value);
-                    System.out.println("Reception: " + identifier + " = " + value);
-                    identifier = value;
-                } else {
-                    System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
-                }
+    
+        if (valueTable.containsKey(identifier)) {
+            System.out.print(statement); // Print user prompt
+            value = scanner.nextLine();  // Read user input using the class-level scanner
+    
+            if (value.matches("-?\\d+(\\.\\d+)?")) {
+                valueTable.put(identifier, value);
+                System.out.println("Reception: " + identifier + " = " + value);
             } else {
-                System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
+                System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
             }
         }
     }

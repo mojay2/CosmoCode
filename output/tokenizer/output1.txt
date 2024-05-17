@@ -31,42 +31,24 @@ sep_op_par
 "Helllo World! :D"
 sep_cl_par
 sep_semicolon
-orbit_token
-sep_op_par
-id_var2
-comp_less_eq
-cmt_0
-logic_or
-id_var3
-comp_eq
-cmt_5
-sep_cl_par
-sep_op_brac
-transmission_token
-sep_op_par
-"This is for orbit"
-sep_cl_par
-sep_semicolon
-sep_cl_brac
-navigate_token
-sep_op_par
 id_var1
-comp_eq
-cmt_4
-sep_cl_par
-sep_op_brac
-transmission_token
+arith_assign
+reception_token
 sep_op_par
-"This is for navigate"
+"Enter value of var1: "
 sep_cl_par
 sep_semicolon
-sep_cl_brac
-propel_token
-sep_op_brac
-transmission_token
+id_var2
+arith_assign
+reception_token
 sep_op_par
-"This is for propel"
+"Enter value of var2: "
 sep_cl_par
 sep_semicolon
-sep_cl_brac
+id_var3
+arith_assign
+reception_token
+sep_op_par
+"Enter value of var3: "
+sep_cl_par
 sep_semicolon
