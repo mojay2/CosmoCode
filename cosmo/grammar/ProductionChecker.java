@@ -1,7 +1,6 @@
 package cosmo.grammar;
 
 import cosmo.ParseTreeNode;
-import cosmo.Interpreter;
 import java.util.*;
 
 public class ProductionChecker {
@@ -505,10 +504,10 @@ public class ProductionChecker {
 
             // arithExp -> arithExp + Term | arithExp - Term
             if (stk[z].equals("factor") &&
-                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))
-                            || (stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div")))
+                    isArithOperator(stk[z + 1])
                     &&
-                    stk[z + 2].equals("factor")) {
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
+                            || stk[z + 2].equals("factor"))) {
                 stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -529,11 +528,11 @@ public class ProductionChecker {
                 return;
             }
 
-            if (stk[z].equals("factor") &&
-                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))
-                            || (stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div")))
+            if (stk[z].equals("arithExp") &&
+                    isArithOperator(stk[z + 1])
                     &&
-                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal"))) {
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
+                            || stk[z + 2].equals("factor"))) {
                 stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -556,6 +555,11 @@ public class ProductionChecker {
         }
     }
 
+    private static boolean isArithOperator(String str) {
+        return (str.equals("arith_plus")) || (str.equals("arith_minus"))
+                || (str.equals("arith_mult")) || (str.equals("arith_div"));
+    }
+
     private static void checkFactorProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
@@ -572,7 +576,7 @@ public class ProductionChecker {
 
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("factor");
+                ParseTreeNode reducedNode = new ParseTreeNode("operator");
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 

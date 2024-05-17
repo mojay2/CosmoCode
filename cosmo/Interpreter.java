@@ -82,7 +82,7 @@ public class Interpreter {
                     value = getLeafValue(child);
                     break;
                 case "arithExp":
-                    value = arithmetic(child, valueTable);
+                    value = Integer.toString(arithmetic(child, valueTable));
                     break;
             }
         }
@@ -106,68 +106,107 @@ public class Interpreter {
         }
     }
 
-    private static String arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
+    private static int arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
         List<String> leaves = getLeaves(node);
         int result = 0;
         String description = "";
 
-        if (node.getSymbol().equals("arithExp")) {
-            String firstOp = leaves.get(0);
-            String operator = leaves.get(1);
-            String secondOp = leaves.get(2);
+        boolean didOperation = true;
 
-            int firstOperand, secondOperand;
+        while (didOperation) {
+            didOperation = false;
 
-            if (firstOp.startsWith("id")) {
-                String id = firstOp.substring(3);
-                firstOperand = Integer.parseInt(valueTable.get(id));
-            } else {
-                String cmt = firstOp.substring(4);
-                firstOperand = Integer.parseInt(cmt);
-            }
-            if (secondOp.startsWith("id")) {
-                String id = secondOp.substring(3);
-                secondOperand = Integer.parseInt(valueTable.get(id));
-            } else {
-                String cmt = secondOp.substring(4);
-                secondOperand = Integer.parseInt(cmt);
-            }
-            result = firstOperand;
+            // Mult & Div
+            for (int i = 1; i < leaves.size(); i += 2) {
+                String operator = leaves.get(i);
+                if (operator.equals("arith_mult") || operator.equals("arith_div")) {
+                    int firstOperand;
+                    String firstLeaf = leaves.get(i - 1);
+                    if (firstLeaf.startsWith("id_")) {
+                        String id = firstLeaf.substring(3);
+                        firstOperand = Integer.parseInt(valueTable.get(id));
+                    } else if (firstLeaf.startsWith("cmt_")) {
+                        String cmt = firstLeaf.substring(4);
+                        firstOperand = Integer.parseInt(cmt);
+                    } else {
+                        firstOperand = Integer.parseInt(firstLeaf);
+                    }
 
-            switch (operator) {
-                case "arith_plus":
-                    result += secondOperand;
-                    description = "Arithmetic: " + firstOperand + " + " + secondOperand + " = " +
-                            result;
+                    String nextLeaf = leaves.get(i + 1);
+                    int nextOperand;
+                    if (nextLeaf.startsWith("id_")) {
+                        String id = nextLeaf.substring(3);
+                        nextOperand = Integer.parseInt(valueTable.get(id));
+                    } else if (nextLeaf.startsWith("cmt_")) {
+                        String cmt = nextLeaf.substring(4);
+                        nextOperand = Integer.parseInt(cmt);
+                    } else {
+                        nextOperand = Integer.parseInt(nextLeaf);
+                    }
+
+                    switch (operator) {
+                        case "arith_mult":
+                            result = firstOperand * nextOperand;
+                            break;
+                        case "arith_div":
+                            result = firstOperand / nextOperand; // !! add logic here for division by zero
+                            break;
+                    }
+
+                    description = "Arithmetic: " + firstOperand + " " + operator + " " + nextOperand + " = " + result;
                     System.out.println(description);
-                    break;
 
-                case "arith_minus":
-                    result -= secondOperand;
-                    description = "Arithmetic: " + firstOperand + " - " + secondOperand + " = " +
-                            result;
-                    System.out.println(description);
+                    // remove processed operands and operator
+                    leaves.remove(i - 1);
+                    leaves.remove(i - 1);
+                    leaves.set(i - 1, String.valueOf(result));
+                    i = 0;
+                    didOperation = true;
                     break;
-
-                case "arith_mult":
-                    result *= secondOperand;
-                    description = "Arithmetic: " + firstOperand + " * " + secondOperand + " = " +
-                            result;
-                    System.out.println(description);
-                    break;
-
-                case "arith_div":
-                    result /= secondOperand;
-                    description = "Arithmetic: " + firstOperand + " / " + secondOperand + " = " +
-                            result;
-                    System.out.println(description);
-                    break;
-
-                default:
-                    break;
+                }
             }
         }
-        return Integer.toString(result);
+
+        // Addition & Subtraction
+        String firstLeaf = leaves.get(0);
+        if (firstLeaf.startsWith("id_")) {
+            String id = firstLeaf.substring(3); // Remove "id_" prefix
+            result = Integer.parseInt(valueTable.get(id));
+        } else if (firstLeaf.startsWith("id_")) {
+            String cmt = firstLeaf.substring(4); // Remove "id_" prefix
+            result = Integer.parseInt(cmt);
+        } else {
+            result = Integer.parseInt(firstLeaf);
+        }
+        description = "Arithmetic: " + result + " ";
+        for (int i = 1; i < leaves.size(); i += 2) {
+            String operator = leaves.get(i);
+            String nextLeaf = leaves.get(i + 1);
+            int nextOperand;
+            if (nextLeaf.startsWith("id_")) {
+                String id = nextLeaf.substring(3); // Remove "id_" prefix
+                nextOperand = Integer.parseInt(valueTable.get(id));
+            } else if (nextLeaf.startsWith("cmt_")) {
+                String cmt = nextLeaf.substring(4); // Remove "id_" prefix
+                nextOperand = Integer.parseInt(cmt);
+            } else {
+                nextOperand = Integer.parseInt(nextLeaf);
+            }
+            switch (operator) {
+                case "arith_plus":
+                    result += nextOperand;
+                    break;
+                case "arith_minus":
+                    result -= nextOperand;
+                    break;
+                default:
+                    System.out.println("Invalid Operator: " + operator + "\n");
+            }
+            description += operator + " " + nextOperand + " = " + result;
+            System.out.println(description);
+        }
+
+        return result;
     }
 
     private static List<String> getLeaves(ParseTreeNode node) {
@@ -199,7 +238,7 @@ public class Interpreter {
                     value = getLeafValue(child);
                     break;
                 case "arithExp":
-                    value = arithmetic(child, valueTable);
+                    value = Integer.toString(arithmetic(child, valueTable));
                     break;
             }
         }

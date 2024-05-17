@@ -12,7 +12,7 @@ id_var1
 arith_assign
 reception_token
 sep_op_par
-"Enter a number "
+"Enter a number for var1 "
 sep_cl_par
 sep_semicolon
 comet_token
@@ -22,7 +22,7 @@ cmt_0
 sep_semicolon
 id_var3
 arith_assign
-id_var1
+cmt_10
 arith_mult
 cmt_10
 sep_semicolon
@@ -32,6 +32,8 @@ arith_assign
 id_var1
 arith_plus
 id_var2
+arith_mult
+cmt_2
 sep_semicolon
 orbit_token
 sep_op_par
@@ -69,6 +71,14 @@ arith_assign
 id_var1
 arith_mult
 cmt_10
+arith_plus
+cmt_50
+arith_mult
+cmt_10
+arith_plus
+cmt_50
+arith_minus
+cmt_20
 sep_semicolon
 sep_cl_brac
 propel_token
