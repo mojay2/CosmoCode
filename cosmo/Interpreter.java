@@ -135,7 +135,6 @@ public class Interpreter {
                 if (value.matches("-?\\d+(\\.\\d+)?") || lookupVariable(value, scopes) != null) {
                     scopes.peek().put(identifier, value);
                     valueTable.put(identifier, value); // Update valueTable
-                    System.out.println("Declaration: " + identifier + " = " + value);
                 } else {
                     throw new IllegalStateException("DECLARATION ERROR: " + value + " has not yet been declared.");
                 }
@@ -204,7 +203,6 @@ public class Interpreter {
                     }
 
                     description = "Arithmetic: " + firstOperand + " " + operator + " " + nextOperand + " = " + result;
-                    System.out.println(description);
 
                     // remove processed operands and operator
                     leaves.remove(i - 1);
@@ -259,7 +257,6 @@ public class Interpreter {
                     System.out.println("Invalid Operator: " + operator + "\n");
             }
             description = "Arithmetic: " + firstOp + " " + operator + " " + nextOperand + " = " + result;
-            System.out.println(description);
         }
 
         return Integer.toString(result);
@@ -298,7 +295,6 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, value);
                             valueTable.put(identifier, value); // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + value);
                             break;
                         }
                     }
@@ -309,7 +305,6 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, assignedValue);
                             valueTable.put(identifier, assignedValue); // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + assignedValue);
                             break;
                         }
                     }
@@ -342,7 +337,6 @@ public class Interpreter {
             String assignedValue = lookupVariable(identifier, scopes);
             if (assignedValue != null) {
                 System.out.println(assignedValue);
-                System.out.println("Transmission: " + assignedValue);
             } else {
                 throw new IllegalStateException(
                         "TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
@@ -383,7 +377,6 @@ public class Interpreter {
                 for (int i = scopes.size() - 1; i >= 0; i--) {
                     if (scopes.get(i).containsKey(identifier)) {
                         scopes.get(i).put(identifier, value);
-                        System.out.println("Reception: " + identifier + " = " + value);
                         break;
                     }
                 }
