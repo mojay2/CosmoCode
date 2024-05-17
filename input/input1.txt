@@ -1,6 +1,13 @@
-Comet var1 = 0 ; 
+Comet x = 5 ;
+Comet y = 10 ;
+Comet z = 3 ;
 
-Whirl ( var1 <= 3 ) {
-	transmission ( "hello" ) ;
-    var1 = var1 + 1 ;
+Comet result = x + y + z ;
+
+Orbit ( result <= 15 ) {
+    transmission ( result ) ;
+    transmission ( "result is less than or equal to 15" ) ; 
+} Propel {
+    transmission ( result ) ;
+    transmission ( "Result is greater than 15" ) ; 
 } ;
