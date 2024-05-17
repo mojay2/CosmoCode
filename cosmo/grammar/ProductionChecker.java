@@ -1,7 +1,6 @@
 package cosmo.grammar;
 
 import cosmo.ParseTreeNode;
-import cosmo.Interpreter;
 import java.util.*;
 
 public class ProductionChecker {
@@ -21,7 +20,6 @@ public class ProductionChecker {
         checkConditionalExpressionProduction(stk, dataTable, root);
         checkExpressionProduction(stk, dataTable, root);
         checkStatementProduction(stk, dataTable, root);
-        checkTermProduction(stk, dataTable, root);
         checkFactorProduction(stk, dataTable, root);
         checkNavigateProduction(stk, dataTable, root);
         checkPropelProduction(stk, dataTable, root);
@@ -433,7 +431,7 @@ public class ProductionChecker {
                     (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
                             && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
                     ||
-                    stk[z].equals("assignStmt")) {
+                    stk[z].equals("assignStmt") || stk[z].equals("decStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "expr";
 
@@ -510,26 +508,12 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
-            // arithExp -> term
-            if (stk[z].equals("term") && !stk[z + 1].equals("arith_mult") && !stk[z + 1].equals("arith_div")) {
-                stk[z] = "arithExp";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-
             // arithExp -> arithExp + Term | arithExp - Term
-            if (stk[z].equals("arithExp") &&
-                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))) &&
-                    stk[z + 2].equals("term")) {
+            if (stk[z].equals("factor") &&
+                    isArithOperator(stk[z + 1])
+                    &&
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
+                            || stk[z + 2].equals("factor"))) {
                 stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -550,19 +534,25 @@ public class ProductionChecker {
                 return;
             }
 
-            // revert the arithExp back to term
-            // when the operation after it is multiplication / division
             if (stk[z].equals("arithExp") &&
-                    ((stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div"))) &&
-                    stk[z + 2].equals("factor")) {
-                stk[z] = "term";
+                    isArithOperator(stk[z + 1])
+                    &&
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
+                            || stk[z + 2].equals("factor"))) {
+                stk[z] = "arithExp";
+                stk[z + 1] = "";
+                stk[z + 2] = "";
 
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 
@@ -571,48 +561,9 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkTermProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule term -> factor
-            if (stk[z].equals("factor")) {
-                stk[z] = "term";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-                root.addChild(previousNode);
-
-                return;
-            }
-
-            // Check for producing rule term -> term * Factor | Term / Factor
-            if (stk[z].equals("term")
-                    && (stk[z + 1].equals("arith_mult") || stk[z + 1].equals("arith_div"))
-                    && stk[z + 2].equals("factor")) {
-                // Perform reduction for identifier
-                stk[z] = "term";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-        }
+    private static boolean isArithOperator(String str) {
+        return (str.equals("arith_plus")) || (str.equals("arith_minus"))
+                || (str.equals("arith_mult")) || (str.equals("arith_div"));
     }
 
     private static void checkFactorProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
@@ -631,27 +582,7 @@ public class ProductionChecker {
 
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arith_op");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-
-            // Check for producing rule factor -> id | comet_literal
-            // (only when id/literal has an operator before it)
-            if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
-                    (stk[z - 1].equals("arith_plus") || stk[z - 1].equals("arith_minus")
-                            || stk[z - 1].equals("arith_mult") || stk[z - 1].equals("arith_div"))) {
-                // Perform reduction
-                stk[z] = "factor";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("factor");
+                ParseTreeNode reducedNode = new ParseTreeNode("operator");
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 

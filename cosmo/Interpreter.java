@@ -1,12 +1,13 @@
 package cosmo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Interpreter {   
+public class Interpreter {
     private static Scanner scanner = new Scanner(System.in);
-    
+
     public static void interpret(ParseTreeNode root, HashMap<String, String> valueTable) {
         if (root == null) {
             return;
@@ -87,10 +88,15 @@ public class Interpreter {
                 case "comet_literal":
                     value = getLeafValue(child);
                     break;
+                case "arithExp":
+                    value = arithmetic(child, valueTable);
+                    break;
             }
         }
 
-        if (identifier != null && value != null) {
+        if (value.startsWith("ARITHMETIC ERROR")) {
+            System.out.println(value);
+        } else if (identifier != null && value != null) {
             if (!valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
                     valueTable.put(identifier, value);
@@ -109,6 +115,136 @@ public class Interpreter {
         }
     }
 
+    private static String arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
+        List<String> leaves = getLeaves(node);
+        int result = 0;
+        String description = "";
+
+        boolean didOperation = true;
+
+        while (didOperation) {
+            didOperation = false;
+
+            // Mult & Div
+            for (int i = 1; i < leaves.size(); i += 2) {
+                String operator = leaves.get(i);
+                if (operator.equals("arith_mult") || operator.equals("arith_div")) {
+                    int firstOperand;
+                    String firstLeaf = leaves.get(i - 1);
+                    if (firstLeaf.startsWith("id_")) {
+                        String firstOp = valueTable.get(firstLeaf.substring(3));
+                        if (firstOp == null || firstOp == "") {
+                            return firstLeaf.substring(3);
+                        }
+                        firstOperand = Integer.parseInt(firstOp);
+                    } else if (firstLeaf.startsWith("cmt_")) {
+                        String cmt = firstLeaf.substring(4);
+                        firstOperand = Integer.parseInt(cmt);
+                    } else {
+                        firstOperand = Integer.parseInt(firstLeaf);
+                    }
+
+                    String nextLeaf = leaves.get(i + 1);
+                    int nextOperand;
+                    if (nextLeaf.startsWith("id_")) {
+                        String nextOp = valueTable.get(nextLeaf.substring(3));
+                        if (nextOp == null || nextOp == "") {
+                            return nextLeaf.substring(3);
+                        }
+                        nextOperand = Integer.parseInt(nextOp);
+                    } else if (nextLeaf.startsWith("cmt_")) {
+                        String cmt = nextLeaf.substring(4);
+                        nextOperand = Integer.parseInt(cmt);
+                    } else {
+                        nextOperand = Integer.parseInt(nextLeaf);
+                    }
+
+                    switch (operator) {
+                        case "arith_mult":
+                            result = firstOperand * nextOperand;
+                            break;
+                        case "arith_div":
+                            if (nextOperand == 0) {
+                                return "ARITHMETIC ERROR: Division by Zero";
+                            }
+                            result = firstOperand / nextOperand;
+                            break;
+                    }
+
+                    description = "Arithmetic: " + firstOperand + " " + operator + " " + nextOperand + " = " + result;
+                    System.out.println(description);
+
+                    // remove processed operands and operator
+                    leaves.remove(i - 1);
+                    leaves.remove(i - 1);
+                    leaves.set(i - 1, String.valueOf(result));
+                    i = 0;
+                    didOperation = true;
+                    break;
+                }
+            }
+        }
+
+        // Addition & Subtraction
+        String firstLeaf = leaves.get(0);
+        if (firstLeaf.startsWith("id_")) {
+            String resultOp = valueTable.get(firstLeaf.substring(3));
+            if (resultOp == null || resultOp == "") {
+                return firstLeaf.substring(3);
+            }
+            result = Integer.parseInt(resultOp);
+        } else if (firstLeaf.startsWith("id_")) {
+            String cmt = firstLeaf.substring(4);
+            result = Integer.parseInt(cmt);
+        } else {
+            result = Integer.parseInt(firstLeaf);
+        }
+        description = "Arithmetic: " + result + " ";
+        for (int i = 1; i < leaves.size(); i += 2) {
+            String operator = leaves.get(i);
+            String nextLeaf = leaves.get(i + 1);
+            int nextOperand;
+            if (nextLeaf.startsWith("id_")) {
+                String nextOp = valueTable.get(firstLeaf.substring(3));
+                if (nextOp == null || nextOp == "") {
+                    return nextLeaf.substring(3);
+                }
+                nextOperand = Integer.parseInt(nextOp);
+            } else if (nextLeaf.startsWith("cmt_")) {
+                String cmt = nextLeaf.substring(4);
+                nextOperand = Integer.parseInt(cmt);
+            } else {
+                nextOperand = Integer.parseInt(nextLeaf);
+            }
+            switch (operator) {
+                case "arith_plus":
+                    result += nextOperand;
+                    break;
+                case "arith_minus":
+                    result -= nextOperand;
+                    break;
+                default:
+                    System.out.println("Invalid Operator: " + operator + "\n");
+            }
+            description += operator + " " + nextOperand + " = " + result;
+            System.out.println(description);
+        }
+
+        return Integer.toString(result);
+    }
+
+    private static List<String> getLeaves(ParseTreeNode node) {
+        List<String> leaves = new ArrayList<>();
+        if (node.isLeaf()) {
+            leaves.add(node.getSymbol());
+        } else {
+            for (ParseTreeNode child : node.getChildren()) {
+                leaves.addAll(getLeaves(child));
+            }
+        }
+        return leaves;
+    }
+
     private static void assignment(ParseTreeNode node, HashMap<String, String> valueTable) {
         String identifier = null;
         String value = null;
@@ -125,10 +261,15 @@ public class Interpreter {
                 case "comet_literal":
                     value = getLeafValue(child);
                     break;
+                case "arithExp":
+                    value = arithmetic(child, valueTable);
+                    break;
             }
         }
 
-        if (identifier != null && value != null) {
+        if (value.startsWith("ARITHMETIC ERROR")) {
+            System.out.println(value);
+        } else if (identifier != null && value != null) {
             if (valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
                     valueTable.put(identifier, value);
@@ -177,7 +318,7 @@ public class Interpreter {
         String statement = null;
         String identifier = null;
         String value = null;
-    
+
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
@@ -191,11 +332,11 @@ public class Interpreter {
                     break;
             }
         }
-    
+
         if (valueTable.containsKey(identifier)) {
             System.out.print(statement); // Print user prompt
-            value = scanner.nextLine();  // Read user input using the class-level scanner
-    
+            value = scanner.nextLine(); // Read user input using the class-level scanner
+
             if (value.matches("-?\\d+(\\.\\d+)?")) {
                 valueTable.put(identifier, value);
                 System.out.println("Reception: " + identifier + " = " + value);
