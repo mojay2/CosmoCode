@@ -138,8 +138,7 @@ public class Parser {
             // Print output based on input validity
             if (isValidInput) {
                 System.out.println("Accept");
-                System.out.println("\n-------------------------------------------------\r\n" + //
-                                        "\n");
+                System.out.println("\n-------------------------------------------------\r\n");
                 System.out.println("Output:");
                 dataTable.add(new String[] { "ACCEPT", "", "" });
                 out.println(treeString);

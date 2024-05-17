@@ -134,10 +134,10 @@ public class Interpreter {
                     scopes.peek().put(identifier, value);
                     valueTable.put(identifier, value);  // Update valueTable
                 } else {
-                    System.out.println("DECLARATION ERROR: " + value + " has not yet been declared.");
+                    throw new IllegalStateException("DECLARATION ERROR: " + value + " has not yet been declared.");
                 }
             } else {
-                System.out.println("DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
+                throw new IllegalStateException("DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
             }
         }
     }
@@ -304,10 +304,10 @@ public class Interpreter {
                         }
                     }
                 } else {
-                    System.out.println("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
+                    throw new IllegalStateException("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
                 }
             } else {
-                System.out.println("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
+                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
             }
         }
     }    
@@ -332,7 +332,7 @@ public class Interpreter {
             if (assignedValue != null) {
                 System.out.println(assignedValue);
             } else {
-                System.out.println("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
+                throw new IllegalStateException("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
             }
         }
 
@@ -351,8 +351,7 @@ public class Interpreter {
                 case "identifier":
                     identifier = getLeafValue(child);
                     if (lookupVariable(identifier, scopes) == null) {
-                        System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
-                        return;
+                        throw new IllegalStateException("RECEPTION ERROR: " + identifier + " has not yet been declared.");
                     }
                     break;
                 case "string":
@@ -439,7 +438,7 @@ public class Interpreter {
         }
 
         if (leftValue == null || rightValue == null || operator == null) {
-            throw new IllegalStateException("Invalid relational expression");
+            throw new IllegalStateException("RELATIONAL ERROR: Invalid relational expression due to null value.");
         }
 
         double left = Double.parseDouble(leftValue);
@@ -459,7 +458,7 @@ public class Interpreter {
             case "comp_eq":
                 return left == right;
             default:
-                throw new IllegalStateException("Unknown relational operator: " + operator);
+                throw new IllegalStateException("RELATIONAL ERROR: Unknown relational operator: " + operator + ".");
         }
     }
 
