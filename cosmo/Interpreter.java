@@ -58,10 +58,10 @@ public class Interpreter {
                 assignment(root, valueTable, scopes);
                 break;
             case "transmissionStmt":
-                transmission(root, valueTable);
+                transmission(root, valueTable, scopes);
                 break;
             case "receptionStmt":
-                reception(root, valueTable);
+                reception(root, valueTable, scopes);
                 break;
             case "whirlLoop":
                 whirl(root, valueTable, scopes);
@@ -184,33 +184,36 @@ public class Interpreter {
         }
     }    
 
-    private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable) {
-        String value = null;
-
+    private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
+        String identifier = null;
+        String string = null;
+    
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
                 case "identifier":
-                    value = getLeafValue(child);
+                    identifier = getLeafValue(child);
                     break;
                 case "string":
-                    // Handle string
-                    value = getLeafValue(child);
-                    value = value.replace("\"", "");
+                    string = getLeafValue(child).replace("\"", "");
                     break;
             }
         }
-
-        if (value != null) {
-            if (valueTable.containsKey(value)) {
-                String assignedValue = valueTable.get(value);
+    
+        if (identifier != null) {
+            String assignedValue = lookupVariable(identifier, scopes);
+            if (assignedValue != null) {
                 System.out.println("Transmission: " + assignedValue);
             } else {
-                System.out.println("Transmission: " + value);
+                System.out.println("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
             }
         }
-    }
 
-    private static void reception(ParseTreeNode node, HashMap<String, String> valueTable) {
+        if (string != null) {
+            System.out.println("Transmission: " + string);
+        }
+    }
+    
+    private static void reception(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         String statement = null;
         String identifier = null;
         String value = null;
@@ -219,8 +222,9 @@ public class Interpreter {
             switch (child.getSymbol()) {
                 case "identifier":
                     identifier = getLeafValue(child);
-                    if (!valueTable.containsKey(identifier)) {
+                    if (lookupVariable(identifier, scopes) == null) {
                         System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
+                        return;
                     }
                     break;
                 case "string":
@@ -229,18 +233,24 @@ public class Interpreter {
             }
         }
     
-        if (valueTable.containsKey(identifier)) {
+        if (lookupVariable(identifier, scopes) != null) {
             System.out.print(statement); // Print user prompt
             value = scanner.nextLine();  // Read user input using the class-level scanner
     
             if (value.matches("-?\\d+(\\.\\d+)?")) {
-                valueTable.put(identifier, value);
+                for (int i = scopes.size() - 1; i >= 0; i--) {
+                    if (scopes.get(i).containsKey(identifier)) {
+                        scopes.get(i).put(identifier, value);
+                        break;
+                    }
+                }
                 System.out.println("Reception: " + identifier + " = " + value);
             } else {
                 System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
             }
         }
     }
+    
 
     private static Boolean logical(ParseTreeNode node, HashMap<String, String> valueTable) {
         Boolean leftValue = null;
@@ -318,22 +328,22 @@ public class Interpreter {
 
         switch (operator) {
             case "comp_not":
-                System.out.println( "REL: " + left + "!=" + right);
+                //System.out.println( "REL: " + left + "!=" + right);
                 return left != right;
             case "comp_less":
-                System.out.println( "REL: " + left + "<" + right);
+                //System.out.println( "REL: " + left + "<" + right);
                 return left < right;
             case "comp_less_eq":
-                System.out.println( "REL: " + left + "<=" + right);
+                //System.out.println( "REL: " + left + "<=" + right);
                 return left <= right;
             case "comp_great":
-                System.out.println( "REL: " + left + ">" + right);
+                //System.out.println( "REL: " + left + ">" + right);
                 return left > right;
             case "comp_great_eq":
-                System.out.println( "REL: " + left + ">=" + right);
+                //System.out.println( "REL: " + left + ">=" + right);
                 return left >= right;
             case "comp_eq":
-                System.out.println( "REL: " + left + "==" + right);
+                //System.out.println( "REL: " + left + "==" + right);
                 return left == right;
             default:
                 throw new IllegalStateException("Unknown relational operator: " + operator);
@@ -357,10 +367,10 @@ public class Interpreter {
                                             assignment(exprChild, valueTable, scopes);
                                             break;
                                         case "transmissionStmt":
-                                            transmission(exprChild, valueTable);
+                                            transmission(exprChild, valueTable, scopes);
                                             break;
                                         case "receptionStmt":
-                                            reception(exprChild, valueTable);
+                                            reception(exprChild, valueTable, scopes);
                                             break;
                                     }
                                 }

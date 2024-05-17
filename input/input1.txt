@@ -6,17 +6,24 @@ var2 = 5 ;
 var3 = 5 ;
 
 Orbit ( var2 != 0 && var3 == 5 || var1 == 2 && var1 == 2 ) {
-    Comet x = 100 ;  
+    Comet x = 100 ;
+    Comet z = 1000 ;  
     transmission ( "orbit" ) ; 
     transmission ( x ) ;
-} Navigate ( var1 < 0 ) { 
-    Comet x = 200 ;  
+} Navigate ( var1 > 0 ) { 
+    Comet x = 200 ; 
+    Comet vary = 300 ;   
     transmission ( "navigate" ) ; 
     transmission ( x ) ;
+    transmission ( vary ) ; 
 } Propel { 
-    Comet x = 300 ;  
+    Comet x = 300 ; 
+    Comet vary = 5000 ;  
     transmission ( "propel" ) ; 
     transmission ( x ) ; 
+    transmission ( vary ) ; 
 } ;
 
+transmission ( vary ) ;
+transmission ( z ) ;
 transmission ( "end" ) ;
