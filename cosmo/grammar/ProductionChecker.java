@@ -21,7 +21,6 @@ public class ProductionChecker {
         checkConditionalExpressionProduction(stk, dataTable, root);
         checkExpressionProduction(stk, dataTable, root);
         checkStatementProduction(stk, dataTable, root);
-        checkTermProduction(stk, dataTable, root);
         checkFactorProduction(stk, dataTable, root);
         checkNavigateProduction(stk, dataTable, root);
         checkPropelProduction(stk, dataTable, root);
@@ -188,8 +187,9 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("transmission_token") && stk[z + 1].equals("sep_op_par") && (stk[z + 2].equals("string") || stk[z + 2].equals("identifier")) &&
-            stk[z + 3].equals("sep_cl_par") && stk[z + 4].equals("sep_semicolon")) {
+            if (stk[z].equals("transmission_token") && stk[z + 1].equals("sep_op_par")
+                    && (stk[z + 2].equals("string") || stk[z + 2].equals("identifier")) &&
+                    stk[z + 3].equals("sep_cl_par") && stk[z + 4].equals("sep_semicolon")) {
                 // Perform reduction for identifier
                 stk[z] = "transmissionStmt";
                 stk[z + 1] = "";
@@ -415,7 +415,6 @@ public class ProductionChecker {
         }
     }
 
-
     private static void checkExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length; z++) {
@@ -427,7 +426,7 @@ public class ProductionChecker {
                     (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
                             && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
                     ||
-                    stk[z].equals("assignStmt")) {
+                    stk[z].equals("assignStmt") || stk[z].equals("decStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "expr";
 
@@ -504,26 +503,12 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
-            // arithExp -> term
-            if (stk[z].equals("term") && !stk[z + 1].equals("arith_mult") && !stk[z + 1].equals("arith_div")) {
-                stk[z] = "arithExp";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-
             // arithExp -> arithExp + Term | arithExp - Term
-            if (stk[z].equals("arithExp") &&
-                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))) &&
-                    stk[z + 2].equals("term")) {
+            if (stk[z].equals("factor") &&
+                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))
+                            || (stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div")))
+                    &&
+                    stk[z + 2].equals("factor")) {
                 stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -544,63 +529,25 @@ public class ProductionChecker {
                 return;
             }
 
-            // revert the arithExp back to term
-            // when the operation after it is multiplication / division
-            if (stk[z].equals("arithExp") &&
-                    ((stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div"))) &&
-                    stk[z + 2].equals("factor")) {
-                stk[z] = "term";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-        }
-    }
-
-    private static void checkTermProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule term -> factor
-            if (stk[z].equals("factor")) {
-                stk[z] = "term";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-                root.addChild(previousNode);
-
-                return;
-            }
-
-            // Check for producing rule term -> term * Factor | Term / Factor
-            if (stk[z].equals("term")
-                    && (stk[z + 1].equals("arith_mult") || stk[z + 1].equals("arith_div"))
-                    && stk[z + 2].equals("factor")) {
-                // Perform reduction for identifier
-                stk[z] = "term";
+            if (stk[z].equals("factor") &&
+                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))
+                            || (stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div")))
+                    &&
+                    (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal"))) {
+                stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
+
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("term");
+                ParseTreeNode previousNode2 = root.popChild();
+                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 
@@ -618,26 +565,6 @@ public class ProductionChecker {
                     (stk[z + 1].equals("arith_plus") || stk[z + 1].equals("arith_minus")
                             || stk[z + 1].equals("arith_mult") || stk[z + 1].equals("arith_div"))) {
                 // Perform reduction for identifier
-                stk[z] = "factor";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arith_op");
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-
-            // Check for producing rule factor -> id | comet_literal
-            // (only when id/literal has an operator before it)
-            if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
-                    (stk[z - 1].equals("arith_plus") || stk[z - 1].equals("arith_minus")
-                            || stk[z - 1].equals("arith_mult") || stk[z - 1].equals("arith_div"))) {
-                // Perform reduction
                 stk[z] = "factor";
 
                 // Add reduction to dataTable

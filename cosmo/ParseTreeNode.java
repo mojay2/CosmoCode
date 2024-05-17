@@ -28,6 +28,10 @@ public class ParseTreeNode {
     this.children.add(child);
   }
 
+  public boolean isLeaf() {
+    return children == null || children.isEmpty();
+  }
+
   public ParseTreeNode popChild() {
     if (children.isEmpty()) {
       return null;
@@ -67,7 +71,7 @@ public class ParseTreeNode {
       sb.append("|____");
     }
     sb.append(node.getSymbol());
-    //System.out.println(sb.toString());
+    // System.out.println(sb.toString());
 
     // Recursively print children
     for (ParseTreeNode child : node.getChildren()) {
