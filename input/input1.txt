@@ -1,16 +1,20 @@
-Comet var1 = 3 ; /* Assigning value 3 to variable var1 */
-Comet var2 = 10 ; /* Assigning value 10 to variable var2 */
-Whirl ( var2 <= var1 ) {
-    transmission ( "hello" ) ;
-} ;
-Launch {
-    x = x + y ;
-} Whirl ( var2 != 0 && var1 < 2 ) ;
-Orbit ( var1 > var2 ) {
-    transmission ( "Greater!" ) ;
-} Navigate ( var1 < var2 ) {
-    transmission ( "Lesser!" ) ;
+Comet var2 = 3 ; 
+Comet var1 = var2 ; 
+Comet var3 = 6 ; 
+var1 = 4 ;
+var2 = 5 ;
+transmission ( var2 ) ; 
+transmission ( "Helllo World! :D" ) ; 
+
+var1 = reception ( "Enter value of var1: " ) ; 
+var2 = reception ( "Enter value of var2: " ) ; 
+var3 = reception ( "Enter value of var3: " ) ; 
+
+
+/* Orbit ( var2 <= 0 || var3 == 5 ) {
+    transmission ( "This is for orbit" ) ;
+} Navigate ( var1 == 4 ) {
+    transmission ( "This is for navigate" ) ;
 } Propel {
-    transmission ( "Equal!" ) ;
-}
-;
+    transmission ( "This is for propel" ) ;
+} ; */

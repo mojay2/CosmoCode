@@ -1,6 +1,7 @@
 package cosmo.grammar;
 
 import cosmo.ParseTreeNode;
+import cosmo.Interpreter;
 import java.util.*;
 
 public class ProductionChecker {
@@ -11,7 +12,6 @@ public class ProductionChecker {
         checkCometLiteralProduction(stk, dataTable, root);
         checkDeclarationProduction(stk, dataTable, root);
         checkAssignmentProduction(stk, dataTable, root);
-        checkIoStatementProduction(stk, dataTable, root);
         checkTransmissionProduction(stk, dataTable, root);
         checkReceptionProduction(stk, dataTable, root);
         checkRelationalOperatorProduction(stk, dataTable, root);
@@ -22,14 +22,7 @@ public class ProductionChecker {
         checkExpressionProduction(stk, dataTable, root);
         checkStatementProduction(stk, dataTable, root);
         checkTermProduction(stk, dataTable, root);
-        checkTermPrimeProduction(stk, dataTable);
-        checkTerm2Production(stk, dataTable, root);
-        checkTermPrime2Production(stk, dataTable);
         checkFactorProduction(stk, dataTable, root);
-        checkTermPrime3Production(stk, dataTable);
-        checkTerm3Production(stk, dataTable);
-        checkArithmeticExpPrimeProduction(stk, dataTable);
-        // checkArithmeticExpressionProduction(stk, dataTable);
         checkNavigateProduction(stk, dataTable, root);
         checkPropelProduction(stk, dataTable, root);
         checkOrbitProduction(stk, dataTable, root);
@@ -37,7 +30,7 @@ public class ProductionChecker {
         checkOrbit3Production(stk, dataTable, root);
         checkWhirlLoopProduction(stk, dataTable, root);
         checkLaunchWhirlLoopProduction(stk, dataTable, root);
-        checkArithmeticExpressionProductionTemp(stk, dataTable, root);
+        checkArithmeticExpressionProduction(stk, dataTable, root);
     }
 
     private static void checkStringProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
@@ -91,7 +84,7 @@ public class ProductionChecker {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].startsWith("comet_") && !stk[z].startsWith("comet_token")) {
+            if (stk[z].startsWith("cmt_")) {
                 // Perform reduction for identifier
                 stk[z] = "comet_literal";
 
@@ -121,7 +114,8 @@ public class ProductionChecker {
                             || stk[z + 3].equals("arithExp"))
                     &&
                     stk[z + 4].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+
+                // Perform reduction for decStmt
                 stk[z] = "decStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -138,10 +132,10 @@ public class ProductionChecker {
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("decStmt");
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode5);
+                reducedNode.addChild(previousNode4);
+                reducedNode.addChild(previousNode3);
+                reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
 
@@ -188,19 +182,20 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkIoStatementProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
+    private static void checkTransmissionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 3; z++) {
+        for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
             // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("sep_op_par") && (stk[z + 1].equals("string") || stk[z + 1].equals("identifier")) &&
-                    stk[z + 2].equals("sep_cl_par") && stk[z + 3].equals("sep_semicolon")) {
+            if (stk[z].equals("transmission_token") && stk[z + 1].equals("sep_op_par") && (stk[z + 2].equals("string") || stk[z + 2].equals("identifier")) &&
+            stk[z + 3].equals("sep_cl_par") && stk[z + 4].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "ioStmt";
+                stk[z] = "transmissionStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
+                stk[z + 4] = "";
 
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
@@ -210,36 +205,11 @@ public class ProductionChecker {
                 ParseTreeNode previousNode2 = root.popChild();
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("ioStmt");
+                ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("transmissionStmt");
+                reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-        }
-    }
-
-    private static void checkTransmissionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("transmission_token") && stk[z + 1].equals("ioStmt")) {
-                // Perform reduction for identifier
-                stk[z] = "transmissionStmt";
-                stk[z + 1] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("transmissionStmt");
                 reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
@@ -256,12 +226,16 @@ public class ProductionChecker {
 
             // Check for producing rule identifier -> id | comet_literal
             if (stk[z].equals("identifier") && stk[z + 1].equals("arith_assign") && stk[z + 2].equals("reception_token")
-                    && stk[z + 3].equals("ioStmt")) {
+                    && stk[z + 3].equals("sep_op_par") && stk[z + 4].equals("string") &&
+                    stk[z + 5].equals("sep_cl_par") && stk[z + 6].equals("sep_semicolon")) {
                 // Perform reduction for identifier
                 stk[z] = "receptionStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
+                stk[z + 4] = "";
+                stk[z + 5] = "";
+                stk[z + 6] = "";
 
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
@@ -272,13 +246,17 @@ public class ProductionChecker {
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
+                ParseTreeNode previousNode6 = root.popChild();
+                ParseTreeNode previousNode7 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("receptionStmt");
+                reducedNode.addChild(previousNode7);
+                reducedNode.addChild(previousNode6);
                 reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
-                root.addChild(previousNode);
 
                 return;
             }
@@ -340,10 +318,12 @@ public class ProductionChecker {
 
     private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 2; z++) {
+
+        for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check if the current sequence matches the production rule
+            // <logicalExp> -> <relationalExp> <logicalOp> <relationalExp>
             if (stk[z].equals("relationalExp") && stk[z + 1].equals("logicalOp")
                     && stk[z + 2].equals("relationalExp")) {
                 // Perform reduction for identifier
@@ -352,18 +332,20 @@ public class ProductionChecker {
                 stk[z + 2] = "";
 
                 // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " +
+                        original, "", "" });
 
                 // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
+                ParseTreeNode closePar = root.popChild();
+                ParseTreeNode relationalExp = root.popChild();
+                ParseTreeNode logicalOp = root.popChild();
+                ParseTreeNode relationalExp2 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode);
+                reducedNode.addChild(relationalExp2);
+                reducedNode.addChild(logicalOp);
+                reducedNode.addChild(relationalExp);
                 root.addChild(reducedNode);
-
+                root.addChild(closePar);
                 return;
             }
         }
@@ -387,17 +369,14 @@ public class ProductionChecker {
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
-                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode idOrComet = root.popChild();
+                ParseTreeNode relationalOp = root.popChild();
+                ParseTreeNode idOrComet2 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("relationalExp");
-                reducedNode.addChild(previousNode4);
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(idOrComet2);
+                reducedNode.addChild(relationalOp);
+                reducedNode.addChild(idOrComet);
                 root.addChild(reducedNode);
-                root.addChild(previousNode);
-
                 return;
             }
         }
@@ -422,21 +401,20 @@ public class ProductionChecker {
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
 
                 // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
-                ParseTreeNode previousNode4 = root.popChild();
+                ParseTreeNode closePar = root.popChild();
+                ParseTreeNode relationalOrLogical = root.popChild();
+                ParseTreeNode openPar = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("conditionalExp");
-                reducedNode.addChild(previousNode4);
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
+                reducedNode.addChild(openPar);
+                reducedNode.addChild(relationalOrLogical);
+                reducedNode.addChild(closePar);
                 root.addChild(reducedNode);
-                root.addChild(previousNode);
 
                 return;
             }
         }
     }
+
 
     private static void checkExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
@@ -446,7 +424,9 @@ public class ProductionChecker {
             // Check for producing rule identifier -> id | comet_literal
             if (stk[z].equals("receptionStmt") ||
                     stk[z].equals("transmissionStmt") ||
-                    stk[z].equals("arithExp") ||
+                    (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
+                            && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
+                    ||
                     stk[z].equals("assignStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "expr";
@@ -467,14 +447,84 @@ public class ProductionChecker {
 
     private static void checkStatementProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
-        // Iterate through the stack elements
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check if the current sequence matches the production rule
-            if (stk[z].equals("sep_op_brac") && stk[z + 1].equals("expr") && stk[z + 2].equals("sep_cl_brac")) {
-                // Perform reduction for the production rule
-                stk[z] = "stmt";
+            // Check if the current sequence matches the production rule <stmt> ->
+            // sep_op_brac (<expr>)* sep_cl_brac
+            if (stk[z].equals("sep_op_brac")) {
+                int exprCount = 0;
+                int i = z + 1;
+
+                // Count the number of <expr> tokens
+                while (i < stk.length && stk[i].equals("expr")) {
+                    exprCount++;
+                    i++;
+                }
+
+                if (exprCount > 0 && i < stk.length && stk[i].equals("sep_cl_brac")) {
+                    // Perform reduction for the production rule
+                    stk[z] = "stmt";
+                    for (int j = z + 1; j <= i; j++) {
+                        stk[j] = "";
+                    }
+
+                    // Add reduction to dataTable
+                    dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                    // Updating Parse Tree
+                    ParseTreeNode reducedNode = new ParseTreeNode("stmt");
+                    ParseTreeNode closingBracketNode = root.popChild(); // sep_cl_brac
+
+                    // Adding expr nodes
+                    List<ParseTreeNode> exprNodes = new ArrayList<>();
+                    for (int k = 0; k < exprCount; k++) {
+                        exprNodes.add(0, root.popChild()); // expr
+                    }
+
+                    ParseTreeNode openingBracketNode = root.popChild(); // sep_op_brac
+                    reducedNode.addChild(openingBracketNode);
+                    for (ParseTreeNode exprNode : exprNodes) {
+                        reducedNode.addChild(exprNode);
+                    }
+                    reducedNode.addChild(closingBracketNode);
+
+                    root.addChild(reducedNode);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    // START OF ARITHMETIC
+    private static void checkArithmeticExpressionProduction(String[] stk, List<String[]> dataTable,
+            ParseTreeNode root) {
+        removeEmptyValuesInBetween(stk);
+        for (int z = 0; z < stk.length - 2; z++) {
+            String original = constructOriginalString(stk, z);
+
+            // arithExp -> term
+            if (stk[z].equals("term") && !stk[z + 1].equals("arith_mult") && !stk[z + 1].equals("arith_div")) {
+                stk[z] = "arithExp";
+
+                // Add reduction to dataTable
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
+                return;
+            }
+
+            // arithExp -> arithExp + Term | arithExp - Term
+            if (stk[z].equals("arithExp") &&
+                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))) &&
+                    stk[z + 2].equals("term")) {
+                stk[z] = "arithExp";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
 
@@ -485,7 +535,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode previousNode2 = root.popChild();
                 ParseTreeNode previousNode3 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("stmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
                 reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
                 reducedNode.addChild(previousNode);
@@ -493,19 +543,12 @@ public class ProductionChecker {
 
                 return;
             }
-        }
-    }
 
-    // START OF ARITHMETIC
-    private static void checkTermProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (z == 0 && (stk[z].equals("identifier") || stk[z].equals("comet_literal"))
-                    && (stk[z + 1].equals("arith_plus") || stk[z + 1].equals("arith_minus"))) {
-                // Perform reduction for identifier
+            // revert the arithExp back to term
+            // when the operation after it is multiplication / division
+            if (stk[z].equals("arithExp") &&
+                    ((stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div"))) &&
+                    stk[z + 2].equals("factor")) {
                 stk[z] = "term";
 
                 // Add reduction to dataTable
@@ -522,15 +565,13 @@ public class ProductionChecker {
         }
     }
 
-    private static void checkTerm2Production(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
+    private static void checkTermProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
-            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal"))
-                    && (stk[z + 1].equals("arith_plus") || stk[z + 1].equals("arith_minus"))) {
-                // Perform reduction for identifier
+            // Check for producing rule term -> factor
+            if (stk[z].equals("factor")) {
                 stk[z] = "term";
 
                 // Add reduction to dataTable
@@ -541,45 +582,28 @@ public class ProductionChecker {
                 ParseTreeNode reducedNode = new ParseTreeNode("term");
                 reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
+                root.addChild(previousNode);
 
                 return;
             }
-        }
-    }
 
-    private static void checkTermPrimeProduction(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
-                    (stk[z - 1].equals("arith_mult") || stk[z - 1].equals("arith_div")) &&
-                    (stk[z + 1].equals("arith_plus") || stk[z + 1].equals("arith_minus"))) {
+            // Check for producing rule term -> term * Factor | Term / Factor
+            if (stk[z].equals("term")
+                    && (stk[z + 1].equals("arith_mult") || stk[z + 1].equals("arith_div"))
+                    && stk[z + 2].equals("factor")) {
                 // Perform reduction for identifier
-                stk[z - 1] = "termPrime";
-                stk[z - 0] = "";
-
+                stk[z] = "term";
+                stk[z + 1] = "";
+                stk[z + 2] = "";
                 // Add reduction to dataTable
                 dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-                return;
-            }
-        }
-    }
 
-    private static void checkTermPrime2Production(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length; z++) {
-            String original = constructOriginalString(stk, z);
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("term");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
 
-            // Check for producing rule identifier -> id | comet_literal
-            if (z > 0 && (stk[z].equals("identifier") || stk[z].equals("comet_literal"))
-                    && stk[z - 1].equals("arith_mult") && z == stk.length - 1) {
-                // Perform reduction for identifier
-                stk[z + 1] = "termPrime";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
                 return;
             }
         }
@@ -589,11 +613,31 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule factor -> id | comet_literal
+            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
+                    (stk[z + 1].equals("arith_plus") || stk[z + 1].equals("arith_minus")
+                            || stk[z + 1].equals("arith_mult") || stk[z + 1].equals("arith_div"))) {
+                // Perform reduction for identifier
+                stk[z] = "factor";
+
+                // Add reduction to dataTable
+                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
+
+                // Update Parse Tree
+                ParseTreeNode previousNode = root.popChild();
+                ParseTreeNode reducedNode = new ParseTreeNode("arith_op");
+                reducedNode.addChild(previousNode);
+                root.addChild(reducedNode);
+
+                return;
+            }
+
+            // Check for producing rule factor -> id | comet_literal
+            // (only when id/literal has an operator before it)
             if (z > 1 && (stk[z].equals("identifier") || stk[z].equals("comet_literal")) &&
                     (stk[z - 1].equals("arith_plus") || stk[z - 1].equals("arith_minus")
                             || stk[z - 1].equals("arith_mult") || stk[z - 1].equals("arith_div"))) {
-                // Perform reduction for identifier
+                // Perform reduction
                 stk[z] = "factor";
 
                 // Add reduction to dataTable
@@ -609,151 +653,7 @@ public class ProductionChecker {
             }
         }
     }
-
-    private static void checkTermPrime3Production(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 2; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("arith_mult") && (stk[z + 1].equals("identifier") || stk[z + 1].equals("comet_literal"))
-                    && stk[z + 2].equals("termPrime")) {
-                // Perform reduction for identifier
-                stk[z] = "termPrime";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-                return;
-            }
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("arith_div") && (stk[z + 1].equals("identifier") || stk[z + 1].equals("comet_literal"))
-                    && stk[z + 2].equals("termPrime")) {
-                // Perform reduction for identifier
-                stk[z] = "termPrime";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-                return;
-            }
-        }
-    }
-
-    private static void checkTerm3Production(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 1; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if ((stk[z].equals("identifier") || stk[z].equals("comet_literal")) && (stk[z + 1].equals("termPrime"))) {
-                // Perform reduction for identifier
-                stk[z] = "term";
-                stk[z + 1] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-                return;
-            }
-        }
-    }
-
-    private static void checkArithmeticExpPrimeProduction(String[] stk, List<String[]> dataTable) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 2; z++) {
-            String original = constructOriginalString(stk, z);
-
-            // Check for producing rule identifier -> id | comet_literal
-            if (stk[z].equals("arith_plus") && (stk[z + 1].equals("term") && stk[z + 2].equals("arithExpPrime")) ||
-                    stk[z].equals("arith_minus") && (stk[z + 1].equals("term") && stk[z + 2].equals("arithExpPrime"))) {
-                // Perform reduction for identifier
-                stk[z] = "arithExpPrime";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-                return;
-            }
-        }
-    }
-
-    // private static void checkArithmeticExpressionProduction(String[] stk,
-    // List<String[]> dataTable) {
-    // removeEmptyValuesInBetween(stk);
-    // for (int z = 0; z < stk.length - 1; z++) {
-    // String original = constructOriginalString(stk, z);
-
-    // // Check for producing rule identifier -> id | comet_literal
-    // if (stk[z].equals("term") && (stk[z + 1].equals("arithExpPrime"))) {
-    // // Perform reduction for identifier
-    // stk[z] = "arithExp";
-    // stk[z + 1] = "";
-
-    // // Add reduction to dataTable
-    // dataTable.add(new String[]{"REDUCE TO " + joinWithoutNull(stk) + " <- " +
-    // original, "", ""});
-    // return;
-    // }
-    // }
-    // }
-
-    private static void checkArithmeticExpressionProductionTemp(String[] stk, List<String[]> dataTable,
-            ParseTreeNode root) {
-        removeEmptyValuesInBetween(stk);
-        for (int z = 0; z < stk.length - 2; z++) {
-            String original = constructOriginalString(stk, z);
-            if (stk[z].equals("term") &&
-                    ((stk[z + 1].equals("arith_plus")) || (stk[z + 1].equals("arith_minus"))) &&
-                    stk[z + 2].equals("factor")) {
-                stk[z] = "arithExp";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-
-            if (stk[z].equals("identifier") &&
-                    ((stk[z + 1].equals("arith_mult")) || (stk[z + 1].equals("arith_div"))) &&
-                    stk[z + 2].equals("factor")) {
-                stk[z] = "arithExp";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
-
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " + original, "", "" });
-
-                // Update Parse Tree
-                ParseTreeNode previousNode = root.popChild();
-                ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("arithExp");
-                reducedNode.addChild(previousNode3);
-                reducedNode.addChild(previousNode2);
-                reducedNode.addChild(previousNode);
-                root.addChild(reducedNode);
-
-                return;
-            }
-        }
-    }
-    // END OF ARITMETIC
+    // END OF ARITHMETIC
 
     private static void checkNavigateProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
@@ -805,12 +705,10 @@ public class ProductionChecker {
                 // Update Parse Tree
                 ParseTreeNode previousNode = root.popChild();
                 ParseTreeNode previousNode2 = root.popChild();
-                ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode reducedNode = new ParseTreeNode("propelStmt");
-                reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
+                reducedNode.addChild(previousNode);
                 root.addChild(reducedNode);
-                root.addChild(previousNode);
 
                 return;
             }
@@ -828,7 +726,7 @@ public class ProductionChecker {
                     stk[z + 2].equals("stmt") &&
                     stk[z + 3].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt1";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
@@ -841,7 +739,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode2 = root.popChild();
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt1");
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
                 reducedNode.addChild(previousNode2);
@@ -865,7 +763,7 @@ public class ProductionChecker {
                     stk[z + 3].equals("propelStmt") &&
                     stk[z + 4].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt2";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
@@ -880,7 +778,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode3 = root.popChild();
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt2");
                 reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);
                 reducedNode.addChild(previousNode3);
@@ -906,7 +804,7 @@ public class ProductionChecker {
                     stk[z + 4].equals("propelStmt") &&
                     stk[z + 5].equals("sep_semicolon")) {
                 // Perform reduction for identifier
-                stk[z] = "orbitStmt";
+                stk[z] = "orbitStmt3";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
                 stk[z + 3] = "";
@@ -923,7 +821,7 @@ public class ProductionChecker {
                 ParseTreeNode previousNode4 = root.popChild();
                 ParseTreeNode previousNode5 = root.popChild();
                 ParseTreeNode previousNode6 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt");
+                ParseTreeNode reducedNode = new ParseTreeNode("orbitStmt3");
                 reducedNode.addChild(previousNode6);
                 reducedNode.addChild(previousNode5);
                 reducedNode.addChild(previousNode4);

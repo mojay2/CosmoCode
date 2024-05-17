@@ -6,21 +6,26 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 
 public class Parser {
     private String[] tokens;
+    private HashMap<String, String> valueTable = new HashMap<>();
 
     public Parser(String[] tokens) {
         this.tokens = tokens;
+        this.valueTable = new HashMap<>(); // Initialize valueTable
     }
 
     int tokenLength = 0;
 
-    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
+    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root, HashMap<String, String> valueTable) {
         ProductionChecker.checkProductions(stk, dataTable, root);
     }
 
@@ -36,6 +41,7 @@ public class Parser {
         // Define the file path
         String parserFilePath = "./output/parser/output" + fileNumber + ".csv";
         String parseTreeFilePath = "./output/parse_tree/output" + fileNumber + ".txt";
+        String valueTableFilePath = "./output/value_table/output" + fileNumber + ".txt";
 
         // Define a String array to hold the stk and remainingInput
         String[] stk = new String[tokenLength];
@@ -65,7 +71,7 @@ public class Parser {
             stk[j] = tokens[j];
 
             // Check stack for production rules
-            check(stk, dataTable, root);
+            check(stk, dataTable, root, valueTable);
         }
 
         // Process the last token separately
@@ -77,11 +83,14 @@ public class Parser {
         root.addChild(new ParseTreeNode(tokens[tokenLength - 1]));
 
         // Check stack for production rules after adding the last token
-        check(stk, dataTable, root);
+        check(stk, dataTable, root, valueTable);
+
+        // Check stack for production rules after adding the last token for arithmetic
+        check(stk, dataTable, root, valueTable);
 
         // Check if the stack contains only valid tokens
         boolean isValidInput = true;
-        String[] validTokens = { "decStmt", "expr", "orbitStmt", "whirlLoop", "launchWhirlLoop" };
+        String[] validTokens = { "decStmt", "expr", "orbitStmt1", "orbitStmt2", "orbitStmt3", "whirlLoop", "launchWhirlLoop" };
 
         // Filter out empty strings from the stack
         List<String> filteredStack = Arrays.stream(stk)
@@ -106,7 +115,7 @@ public class Parser {
             }
         }
 
-        System.out.println("CHECK: " + Arrays.toString(filteredStk));
+        // System.out.println("CHECK: " + Arrays.toString(filteredStk));
 
         if (!isValidInput) {
             ArrayList<String> list = new ArrayList<>();
@@ -116,7 +125,7 @@ public class Parser {
             }
             list = checkProds(list);
             list = retrieveValidTokens(list);
-            System.out.println(list);
+            // System.out.println(list);
             if (list.get(0).equals("arithExp") && list.size() == 1) {
                 isValidInput = true;
             }
@@ -129,6 +138,7 @@ public class Parser {
                 System.out.println("Accept");
                 dataTable.add(new String[] { "ACCEPT", "", "" });
                 out.println(treeString);
+                Interpreter.interpret(root, valueTable);
             } else {
                 System.out.println("Reject");
                 dataTable.add(new String[] { "REJECT", "", "" });
@@ -140,6 +150,8 @@ public class Parser {
 
         // Write data to CSV file
         writeOutputToFile(parserFilePath, dataTable);
+        // Write final value table to txt file
+        writeValueTableToFile(valueTableFilePath);
     }
 
     public static String joinWithoutNull(String[] arr) {
@@ -163,9 +175,21 @@ public class Parser {
                 }
                 writer.append("\n");
             }
-            System.out.println("CSV file has been created successfully!");
+            // System.out.println("CSV file has been created successfully!");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void writeValueTableToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (Map.Entry<String, String> entry : valueTable.entrySet()) {
+                writer.write(entry.getKey() + " : " + entry.getValue());
+                writer.newLine();
+            }
+            // System.out.println("Value table has been written to " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error writing value table to file: " + e.getMessage());
         }
     }
 

@@ -18,43 +18,44 @@ public class Tokenizer {
 
     public void processInputs() {
         for (int i = 1; i <= 3; i++) {
-            String[] tokens = processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt", "./output/symbol_table/output" + i + ".txt");
+            String[] tokens = processInput("./input/input" + i + ".txt", "./output/tokenizer/output" + i + ".txt",
+                    "./output/symbol_table/output" + i + ".txt");
             Parser parser = new Parser(tokens);
             parser.parse(i); // Invoke the parsing process
         }
     }
-    
 
     public String[] processInput(String inputPath, String outputPath, String symbolTablePath) {
         String input = readInput(inputPath);
         System.out.println("=================================================");
+        // System.out.println("Input from " + inputPath );
         System.out.println("Input from " + inputPath + ":\n" + input);
-    
+
         // split into array
         arrayInput = input.trim().split("\\s+");
-        System.out.println("\nInput Converted to String Array:\n" + Arrays.toString(arrayInput));
+        // System.out.println("\nInput Converted to String Array:\n" +
+        // Arrays.toString(arrayInput));
 
         // Get symbol table
         Map<String, String> symbolTable = SymbolTable.createSymbolTableMap();
-    
+
         // pass to tokenizer
         String[] tokenized = tokenize(arrayInput, symbolTable);
-        System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
-    
+        // System.out.println("\nTokenized Input:\n" + Arrays.toString(tokenized));
+
         // Print symbol table to console
-        System.out.println("\nSymbol Table:\n");
-        System.out.println(formatMap(symbolTable));
-        
+        // System.out.println("\nSymbol Table:\n");
+        // System.out.println(formatMap(symbolTable));
+
         // Write symbol table to file
         writeSymbolTableToFile(symbolTablePath, symbolTable);
-    
+
         System.out.println("\nTotal number of errors:\n" + totalErrors);
         System.out.println("=================================================");
         writeOutputToFile(outputPath, tokenized);
 
         return tokenized;
     }
-    
 
     public String readInput(String inputPath) {
         StringBuilder inputBuilder = new StringBuilder();
@@ -75,7 +76,7 @@ public class Tokenizer {
                 bw.write(token);
                 bw.newLine();
             }
-            System.out.println("Tokenized input written to " + outputPath);
+            // System.out.println("Tokenized input written to " + outputPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,7 +88,7 @@ public class Tokenizer {
             for (Map.Entry<String, String> entry : symbolTable.entrySet()) {
                 writer.write(entry.getKey() + " : " + entry.getValue() + "\n");
             }
-            System.out.println("Symbol table written to: " + outputPath);
+            // System.out.println("Symbol table written to: " + outputPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -102,7 +103,7 @@ public class Tokenizer {
             if (ReservedWords.createReservedWordsMap().containsKey(input[i])) { // Keyword
                 tokenList.add(ReservedWords.createReservedWordsMap().get(input[i]));
             } else if (input[i].matches("-?\\d+")) { // Comet
-                tokenList.add("comet_" + input[i]);
+                tokenList.add("cmt_" + input[i]);
             } else if (Separator.createSeparatorMap().containsKey(input[i])) { // Separator
                 tokenList.add("sep_" + Separator.createSeparatorMap().get(input[i]));
             } else if (Comparison.createComparisonMap().containsKey(input[i])) { // Comparison Operator
@@ -111,7 +112,7 @@ public class Tokenizer {
                 tokenList.add("logic_" + LogicalOperators.createLogicalMap().get(input[i]));
             } else if (ArithmeticOperators.createArithmeticMap().containsKey(input[i])) { // Arithmetic Operator
                 tokenList.add("arith_" + ArithmeticOperators.createArithmeticMap().get(input[i]));
-            }  else if (input[i].matches("[a-zA-Z0-9_]+")) { // Identifier / ?Variable?
+            } else if (input[i].matches("[a-zA-Z0-9_]+")) { // Identifier / ?Variable?
                 if (isReservedWord(input[i])) {
                     counter++;
                     tokenList.add("invalid_token_" + counter);

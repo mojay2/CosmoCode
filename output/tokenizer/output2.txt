@@ -1,23 +1,50 @@
 comet_token
-id_x
+id_var2
 arith_assign
-comet_5
+cmt_3
 sep_semicolon
 comet_token
-id_y
+id_var1
 arith_assign
-comet_10
+id_var2
+sep_semicolon
+comet_token
+id_var3
+arith_assign
+cmt_6
+sep_semicolon
+id_var1
+arith_assign
+cmt_4
+sep_semicolon
+id_var2
+arith_assign
+cmt_5
+sep_semicolon
+transmission_token
+sep_op_par
+id_var2
+sep_cl_par
+sep_semicolon
+transmission_token
+sep_op_par
+"Helllo World! :D"
+sep_cl_par
 sep_semicolon
 orbit_token
 sep_op_par
-id_result
+id_var2
 comp_less_eq
-comet_15
+cmt_0
+logic_or
+id_var3
+comp_eq
+cmt_5
 sep_cl_par
 sep_op_brac
 transmission_token
 sep_op_par
-"Result is less than or equal to 15"
+"This is for orbit"
 sep_cl_par
 sep_semicolon
 sep_cl_brac
@@ -25,7 +52,7 @@ propel_token
 sep_op_brac
 transmission_token
 sep_op_par
-"Result is greater than 15"
+"This is for propel"
 sep_cl_par
 sep_semicolon
 sep_cl_brac
