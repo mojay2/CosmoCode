@@ -1,19 +1,29 @@
 Comet var2 = 3 ; 
-Comet var1 = 0 ;
-var1 = reception ( "Enter a number for var1 " ) ;
-Comet var3 = 0 ;
+Comet var1 = var2 ; 
+Comet var3 = 3 ; 
+var1 = 4 ;
+var2 = 5 ;
+var3 = 5 ;
 
-var3 = 10 * 10 ;
-
-Comet var4 = var1 + var2 * 2 ;
-
-Orbit ( var1 > var2 ) {
-  transmission ( "greater!" ) ;
-  Comet var6 = 10 ;
-} Navigate (  var1 < var2 ) {
-  transmission ( "lesser!" ) ;
-  Comet var6 = var1 * 10 + 50 * 10 + 50 - 20 ;
-} Propel {
-  transmission ( "equal" ) ;
+Orbit ( var2 != 0 && var3 == 5 || var1 == 2 && var1 == 2 ) {
+    Comet x = 100 ;
+    Comet z = 1000 ;  
+    transmission ( "orbit" ) ; 
+    transmission ( x ) ;
+} Navigate ( var1 > 0 ) { 
+    Comet x = 200 ; 
+    Comet vary = 300 ;   
+    transmission ( "navigate" ) ; 
+    transmission ( x ) ;
+    transmission ( vary ) ; 
+} Propel { 
+    Comet x = 300 ; 
+    Comet vary = 5000 ;  
+    transmission ( "propel" ) ; 
+    transmission ( x ) ; 
+    transmission ( vary ) ; 
 } ;
 
+transmission ( vary ) ;
+transmission ( z ) ;
+transmission ( "end" ) ;

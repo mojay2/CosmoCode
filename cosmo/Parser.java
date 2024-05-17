@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.io.BufferedWriter;
@@ -17,10 +18,12 @@ import java.io.FileNotFoundException;
 public class Parser {
     private String[] tokens;
     private HashMap<String, String> valueTable = new HashMap<>();
+    private static Stack<HashMap<String, String>> scopes = new Stack<>();
 
     public Parser(String[] tokens) {
         this.tokens = tokens;
         this.valueTable = new HashMap<>(); // Initialize valueTable
+        scopes.push(new HashMap<>());
     }
 
     int tokenLength = 0;
@@ -139,7 +142,7 @@ public class Parser {
                 System.out.println("Accept");
                 dataTable.add(new String[] { "ACCEPT", "", "" });
                 out.println(treeString);
-                Interpreter.interpret(root, valueTable);
+                Interpreter.interpret(root, valueTable, scopes);
             } else {
                 System.out.println("Reject");
                 dataTable.add(new String[] { "REJECT", "", "" });

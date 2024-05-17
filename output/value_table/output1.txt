@@ -1,5 +1,5 @@
-var6 : 550
-var4 : 8
-var3 : 100
-var2 : 3
-var1 : 2
+vary : 300
+x : 200
+var3 : 5
+var2 : 5
+var1 : 4
