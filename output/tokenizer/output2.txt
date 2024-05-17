@@ -92,11 +92,6 @@ sep_cl_brac
 sep_semicolon
 transmission_token
 sep_op_par
-id_var6
-sep_cl_par
-sep_semicolon
-transmission_token
-sep_op_par
 "end"
 sep_cl_par
 sep_semicolon

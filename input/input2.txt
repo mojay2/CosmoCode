@@ -17,5 +17,4 @@ Orbit ( var1 > var2 ) {
   transmission ( "equal" ) ;
 } ;
 
-transmission ( var6 ) ; 
 transmission ( "end" ) ; 

@@ -81,9 +81,9 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule comet -> number
             if (stk[z].startsWith("cmt_")) {
-                // Perform reduction for identifier
+                // Perform reduction for comet
                 stk[z] = "comet_literal";
 
                 // Add reduction to dataTable
@@ -147,14 +147,14 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule assignment -> id | comet_literal | arihtmetic
             if (stk[z].equals("identifier") &&
                     stk[z + 1].equals("arith_assign") &&
                     (stk[z + 2].equals("identifier") || stk[z + 2].equals("comet_literal")
                             || stk[z + 2].equals("arithExp"))
                     &&
                     stk[z + 3].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for assignment
                 stk[z] = "assignStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -185,11 +185,11 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule transmission -> transmission ( string | id )
             if (stk[z].equals("transmission_token") && stk[z + 1].equals("sep_op_par")
                     && (stk[z + 2].equals("string") || stk[z + 2].equals("identifier")) &&
                     stk[z + 3].equals("sep_cl_par") && stk[z + 4].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for transmission
                 stk[z] = "transmissionStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -393,7 +393,7 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule conditional -> ( relationalExp ) | ( logicalExp )
             if ((stk[z].equals("sep_op_par") && stk[z + 1].equals("relationalExp") && stk[z + 2].equals("sep_cl_par"))
                     || (stk[z].equals("sep_op_par") && stk[z + 1].equals("logicalExp")
                             && stk[z + 2].equals("sep_cl_par"))) {
@@ -425,14 +425,14 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule expression -> transmission | reception | arithmetic | assignment | declaration
             if (stk[z].equals("receptionStmt") ||
                     stk[z].equals("transmissionStmt") ||
                     (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
                             && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
                     ||
                     stk[z].equals("assignStmt") || stk[z].equals("decStmt")) {
-                // Perform reduction for identifier
+                // Perform reduction for expression
                 stk[z] = "expr";
 
                 // Add reduction to dataTable
@@ -597,11 +597,11 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 2; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule navigate -> navigate ( condition ) { stmt }
             if (stk[z].equals("navigate_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt")) {
-                // Perform reduction for identifier
+                // Perform reduction for navigate
                 stk[z] = "navigateStmt";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -629,7 +629,7 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 1; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule propel -> propel { stmt }
             if (stk[z].equals("propel_token") &&
                     stk[z + 1].equals("stmt")) {
                 // Perform reduction for identifier
@@ -657,12 +657,12 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule orbit -> orbit ( condition ) { stmt } ;
             if (stk[z].equals("orbit_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
                     stk[z + 3].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for orbit
                 stk[z] = "orbitStmt1";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -693,13 +693,13 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule orbit -> orbit ( condition ) { stmt } propel { stmt } ;
             if (stk[z].equals("orbit_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
                     stk[z + 3].equals("propelStmt") &&
                     stk[z + 4].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for orbit
                 stk[z] = "orbitStmt2";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -733,7 +733,7 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 5; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule orbit -> orbit ( condition ) { stmt } navigate ( condition ) { stmt } propel { stmt } ;
             if (stk[z].equals("orbit_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
@@ -777,12 +777,12 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 3; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule whirl -> whirl ( condition ) { stmt } ;
             if (stk[z].equals("whirl_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
                     stk[z + 3].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for whirl
                 stk[z] = "whirlLoop";
                 stk[z + 1] = "";
                 stk[z + 2] = "";
@@ -812,13 +812,13 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule identifier -> id | comet_literal
+            // Check for producing rule launchWhirl -> launchWhirl { stmt } whirl ( condition ) ; 
             if (stk[z].equals("launchwhirl_token") &&
                     stk[z + 1].equals("stmt") &&
                     stk[z + 2].equals("whirl_token") &&
                     stk[z + 3].equals("conditionalExp") &&
                     stk[z + 4].equals("sep_semicolon")) {
-                // Perform reduction for identifier
+                // Perform reduction for launchWhirl
                 stk[z] = "launchWhirlLoop";
                 stk[z + 1] = "";
                 stk[z + 2] = "";

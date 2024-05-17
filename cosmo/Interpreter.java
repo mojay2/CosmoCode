@@ -27,9 +27,7 @@ public class Interpreter {
         }
         return null; // Variable not found in any scope
     }
-    
-    
-    
+       
     public static void interpret(ParseTreeNode root, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         if (root == null) {
             return;
@@ -70,8 +68,6 @@ public class Interpreter {
             case "launchWhirlLoop":
                 launchWhirl(root, valueTable, scopes);
                 break;
-
-            // Add more cases for other statement types
             default:
                 for (ParseTreeNode child : root.getChildren()) {
                     interpret(child, valueTable, scopes);
@@ -96,6 +92,18 @@ public class Interpreter {
         }
     }
 
+    private static List<String> getLeaves(ParseTreeNode node) {
+        List<String> leaves = new ArrayList<>();
+        if (node.isLeaf()) {
+            leaves.add(node.getSymbol());
+        } else {
+            for (ParseTreeNode child : node.getChildren()) {
+                leaves.addAll(getLeaves(child));
+            }
+        }
+        return leaves;
+    }
+
     private static void declaration(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         String identifier = null;
         String value = null;
@@ -118,21 +126,18 @@ public class Interpreter {
             }
         }
       
-        if (value.startsWith("ARITHMETIC ERROR")) {
-            System.out.println(value);
-        } else if (identifier != null && value != null) {
+        if (identifier != null && value != null) {
             // Check if the identifier is already declared in the current scope
             if (!scopes.peek().containsKey(identifier)) {
                 // Check if the value is a valid number or a declared variable
                 if (value.matches("-?\\d+(\\.\\d+)?") || lookupVariable(value, scopes) != null) {
                     scopes.peek().put(identifier, value);
                     valueTable.put(identifier, value);  // Update valueTable
-                    System.out.println("Declaration: " + identifier + " = " + value);
                 } else {
-                    System.out.println("DECLARATION ERROR: " + value + " has not yet been declared.");
+                    throw new IllegalStateException("DECLARATION ERROR: " + value + " has not yet been declared.");
                 }
             } else {
-                System.out.println("DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
+                throw new IllegalStateException("DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
             }
         }
     }
@@ -194,7 +199,6 @@ public class Interpreter {
                     }
 
                     description = "Arithmetic: " + firstOperand + " " + operator + " " + nextOperand + " = " + result;
-                    System.out.println(description);
 
                     // remove processed operands and operator
                     leaves.remove(i - 1);
@@ -249,7 +253,6 @@ public class Interpreter {
                     System.out.println("Invalid Operator: " + operator + "\n");
             }
             description += operator + " " + nextOperand + " = " + result;
-            System.out.println(description);
         }
 
         return Integer.toString(result);
@@ -277,9 +280,7 @@ public class Interpreter {
             }
         }
 
-        if (value.startsWith("ARITHMETIC ERROR")) {
-            System.out.println(value);
-        } else if (identifier != null && value != null) {
+        if (identifier != null && value != null) {
             // Check if the identifier is declared in any scope
             if (lookupVariable(identifier, scopes) != null) {
                 // Check if the value is a valid number or a declared variable
@@ -289,7 +290,6 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, value);
                             valueTable.put(identifier, value);  // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + value);
                             break;
                         }
                     }
@@ -300,30 +300,17 @@ public class Interpreter {
                         if (scopes.get(i).containsKey(identifier)) {
                             scopes.get(i).put(identifier, assignedValue);
                             valueTable.put(identifier, assignedValue);  // Update valueTable
-                            System.out.println("Assignment: " + identifier + " = " + assignedValue);
                             break;
                         }
                     }
                 } else {
-                    System.out.println("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
+                    throw new IllegalStateException("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
                 }
             } else {
-                System.out.println("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
+                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
             }
         }
     }    
-
-    private static List<String> getLeaves(ParseTreeNode node) {
-        List<String> leaves = new ArrayList<>();
-        if (node.isLeaf()) {
-            leaves.add(node.getSymbol());
-        } else {
-            for (ParseTreeNode child : node.getChildren()) {
-                leaves.addAll(getLeaves(child));
-            }
-        }
-        return leaves;
-    }
 
     private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         String identifier = null;
@@ -343,14 +330,14 @@ public class Interpreter {
         if (identifier != null) {
             String assignedValue = lookupVariable(identifier, scopes);
             if (assignedValue != null) {
-                System.out.println("Transmission: " + assignedValue);
+                System.out.println(assignedValue);
             } else {
-                System.out.println("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
+                throw new IllegalStateException("TRANSMISSION ERROR: " + identifier + " has not yet been declared or is out of scope.");
             }
         }
 
         if (string != null) {
-            System.out.println("Transmission: " + string);
+            System.out.println(string);
         }
     }
     
@@ -364,8 +351,7 @@ public class Interpreter {
                 case "identifier":
                     identifier = getLeafValue(child);
                     if (lookupVariable(identifier, scopes) == null) {
-                        System.out.println("RECEPTION ERROR: " + identifier + " has not yet been declared.");
-                        return;
+                        throw new IllegalStateException("RECEPTION ERROR: " + identifier + " has not yet been declared.");
                     }
                     break;
                 case "string":
@@ -385,7 +371,6 @@ public class Interpreter {
                         break;
                     }
                 }
-                System.out.println("Reception: " + identifier + " = " + value);
             } else {
                 System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
             }
@@ -453,15 +438,7 @@ public class Interpreter {
         }
 
         if (leftValue == null || rightValue == null || operator == null) {
-            if (leftValue == null) {
-                System.err.println("Left Value is Null");
-            } else if (rightValue == null) {
-                System.out.println( "left value is " + leftValue);
-                System.err.println("Right Value is Null");
-            } else {
-                System.err.println("Operator is Null");
-            }
-            throw new IllegalStateException("Invalid relational expression");
+            throw new IllegalStateException("RELATIONAL ERROR: Invalid relational expression due to null value.");
         }
 
         double left = Double.parseDouble(leftValue);
@@ -469,25 +446,19 @@ public class Interpreter {
 
         switch (operator) {
             case "comp_not":
-                System.out.println("REL: " + left + " != " + right + " RESULT: " + (left != right));
                 return left != right;
             case "comp_less":
-                System.out.println("REL: " + left + " < " + right + " RESULT: " + (left < right));
                 return left < right;
             case "comp_less_eq":
-                System.out.println("REL: " + left + " <= " + right + " RESULT: " + (left <= right));
                 return left <= right;
             case "comp_great":
-                System.out.println("REL: " + left + " > " + right + " RESULT: " + (left > right));
                 return left > right;
             case "comp_great_eq":
-                System.out.println("REL: " + left + " >= " + right + " RESULT: " + (left >= right));
                 return left >= right;
             case "comp_eq":
-                System.out.println("REL: " + left + " == " + right + " RESULT: " + (left == right));
                 return left == right;
             default:
-                throw new IllegalStateException("Unknown relational operator: " + operator);
+                throw new IllegalStateException("RELATIONAL ERROR: Unknown relational operator: " + operator + ".");
         }
     }
 
