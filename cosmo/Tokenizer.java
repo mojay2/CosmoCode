@@ -20,6 +20,9 @@ public class Tokenizer {
         Scanner scanner = new Scanner(System.in);
         boolean continueProcessing = true;
 
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
         System.out.println("****************************************");
         System.out.println("*                                      *");
         System.out.println("*         Welcome to CosmoCode!        *");
@@ -45,6 +48,8 @@ public class Tokenizer {
                     "./output/symbol_table/output" + choice + ".txt");
             Parser parser = new Parser(tokens);
             parser.parse(choice); // Invoke the parsing process
+
+            System.out.println("\n-------------------------------------------------\r\n");
 
             System.out.println("Would you like to continue? (yes/no)");
             String continueChoice = scanner.next();
