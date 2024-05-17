@@ -433,7 +433,7 @@ public class ProductionChecker {
                     (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
                             && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
                     ||
-                    stk[z].equals("assignStmt")) {
+                    stk[z].equals("assignStmt") || stk[z].equals("decStmt")) {
                 // Perform reduction for identifier
                 stk[z] = "expr";
 
