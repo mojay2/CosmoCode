@@ -137,7 +137,7 @@ public class Interpreter {
         }
     }
 
-    private static void assignment(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
+    private static String arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
         List<String> leaves = getLeaves(node);
         int result = 0;
         String description = "";
@@ -254,6 +254,64 @@ public class Interpreter {
 
         return Integer.toString(result);
     }
+
+    private static void assignment(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
+        String identifier = null;
+        String value = null;
+    
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    if (identifier == null) {
+                        identifier = getLeafValue(child);
+                    } else {
+                        value = getLeafValue(child);
+                    }
+                    break;
+                case "comet_literal":
+                    value = getLeafValue(child);
+                    break;
+                case "arithExp":
+                    value = arithmetic(child, valueTable);
+                    break;
+            }
+        }
+
+        if (value.startsWith("ARITHMETIC ERROR")) {
+            System.out.println(value);
+        } else if (identifier != null && value != null) {
+            // Check if the identifier is declared in any scope
+            if (lookupVariable(identifier, scopes) != null) {
+                // Check if the value is a valid number or a declared variable
+                if (value.matches("-?\\d+(\\.\\d+)?")) {
+                    // Update the variable in the most specific scope
+                    for (int i = scopes.size() - 1; i >= 0; i--) {
+                        if (scopes.get(i).containsKey(identifier)) {
+                            scopes.get(i).put(identifier, value);
+                            valueTable.put(identifier, value);  // Update valueTable
+                            System.out.println("Assignment: " + identifier + " = " + value);
+                            break;
+                        }
+                    }
+                } else if (lookupVariable(value, scopes) != null) {
+                    String assignedValue = lookupVariable(value, scopes);
+                    // Update the variable in the most specific scope
+                    for (int i = scopes.size() - 1; i >= 0; i--) {
+                        if (scopes.get(i).containsKey(identifier)) {
+                            scopes.get(i).put(identifier, assignedValue);
+                            valueTable.put(identifier, assignedValue);  // Update valueTable
+                            System.out.println("Assignment: " + identifier + " = " + assignedValue);
+                            break;
+                        }
+                    }
+                } else {
+                    System.out.println("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
+                }
+            } else {
+                System.out.println("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
+            }
+        }
+    }    
 
     private static List<String> getLeaves(ParseTreeNode node) {
         List<String> leaves = new ArrayList<>();

@@ -5,8 +5,6 @@ Symbol Table:
 vary : id_vary
 transmission : transmission_token
 Propel : propel_token
-var6 : id_var6
-var4 : id_var4
 var3 : id_var3
 reception : reception_token
 var2 : id_var2
