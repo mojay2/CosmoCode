@@ -1,5 +1,5 @@
-var6 : 10
-var4 : 11
+var6 : 550
+var4 : 8
 var3 : 100
 var2 : 3
-var1 : 5
+var1 : 2

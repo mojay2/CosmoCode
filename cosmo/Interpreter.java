@@ -89,12 +89,14 @@ public class Interpreter {
                     value = getLeafValue(child);
                     break;
                 case "arithExp":
-                    value = Integer.toString(arithmetic(child, valueTable));
+                    value = arithmetic(child, valueTable);
                     break;
             }
         }
 
-        if (identifier != null && value != null) {
+        if (value.startsWith("ARITHMETIC ERROR")) {
+            System.out.println(value);
+        } else if (identifier != null && value != null) {
             if (!valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
                     valueTable.put(identifier, value);
@@ -113,7 +115,7 @@ public class Interpreter {
         }
     }
 
-    private static int arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
+    private static String arithmetic(ParseTreeNode node, HashMap<String, String> valueTable) {
         List<String> leaves = getLeaves(node);
         int result = 0;
         String description = "";
@@ -130,8 +132,11 @@ public class Interpreter {
                     int firstOperand;
                     String firstLeaf = leaves.get(i - 1);
                     if (firstLeaf.startsWith("id_")) {
-                        String id = firstLeaf.substring(3);
-                        firstOperand = Integer.parseInt(valueTable.get(id));
+                        String firstOp = valueTable.get(firstLeaf.substring(3));
+                        if (firstOp == null || firstOp == "") {
+                            return firstLeaf.substring(3);
+                        }
+                        firstOperand = Integer.parseInt(firstOp);
                     } else if (firstLeaf.startsWith("cmt_")) {
                         String cmt = firstLeaf.substring(4);
                         firstOperand = Integer.parseInt(cmt);
@@ -142,8 +147,11 @@ public class Interpreter {
                     String nextLeaf = leaves.get(i + 1);
                     int nextOperand;
                     if (nextLeaf.startsWith("id_")) {
-                        String id = nextLeaf.substring(3);
-                        nextOperand = Integer.parseInt(valueTable.get(id));
+                        String nextOp = valueTable.get(nextLeaf.substring(3));
+                        if (nextOp == null || nextOp == "") {
+                            return nextLeaf.substring(3);
+                        }
+                        nextOperand = Integer.parseInt(nextOp);
                     } else if (nextLeaf.startsWith("cmt_")) {
                         String cmt = nextLeaf.substring(4);
                         nextOperand = Integer.parseInt(cmt);
@@ -156,7 +164,10 @@ public class Interpreter {
                             result = firstOperand * nextOperand;
                             break;
                         case "arith_div":
-                            result = firstOperand / nextOperand; // !! add logic here for division by zero
+                            if (nextOperand == 0) {
+                                return "ARITHMETIC ERROR: Division by Zero";
+                            }
+                            result = firstOperand / nextOperand;
                             break;
                     }
 
@@ -177,10 +188,13 @@ public class Interpreter {
         // Addition & Subtraction
         String firstLeaf = leaves.get(0);
         if (firstLeaf.startsWith("id_")) {
-            String id = firstLeaf.substring(3); // Remove "id_" prefix
-            result = Integer.parseInt(valueTable.get(id));
+            String resultOp = valueTable.get(firstLeaf.substring(3));
+            if (resultOp == null || resultOp == "") {
+                return firstLeaf.substring(3);
+            }
+            result = Integer.parseInt(resultOp);
         } else if (firstLeaf.startsWith("id_")) {
-            String cmt = firstLeaf.substring(4); // Remove "id_" prefix
+            String cmt = firstLeaf.substring(4);
             result = Integer.parseInt(cmt);
         } else {
             result = Integer.parseInt(firstLeaf);
@@ -191,10 +205,13 @@ public class Interpreter {
             String nextLeaf = leaves.get(i + 1);
             int nextOperand;
             if (nextLeaf.startsWith("id_")) {
-                String id = nextLeaf.substring(3); // Remove "id_" prefix
-                nextOperand = Integer.parseInt(valueTable.get(id));
+                String nextOp = valueTable.get(firstLeaf.substring(3));
+                if (nextOp == null || nextOp == "") {
+                    return nextLeaf.substring(3);
+                }
+                nextOperand = Integer.parseInt(nextOp);
             } else if (nextLeaf.startsWith("cmt_")) {
-                String cmt = nextLeaf.substring(4); // Remove "id_" prefix
+                String cmt = nextLeaf.substring(4);
                 nextOperand = Integer.parseInt(cmt);
             } else {
                 nextOperand = Integer.parseInt(nextLeaf);
@@ -213,7 +230,7 @@ public class Interpreter {
             System.out.println(description);
         }
 
-        return result;
+        return Integer.toString(result);
     }
 
     private static List<String> getLeaves(ParseTreeNode node) {
@@ -245,12 +262,14 @@ public class Interpreter {
                     value = getLeafValue(child);
                     break;
                 case "arithExp":
-                    value = Integer.toString(arithmetic(child, valueTable));
+                    value = arithmetic(child, valueTable);
                     break;
             }
         }
 
-        if (identifier != null && value != null) {
+        if (value.startsWith("ARITHMETIC ERROR")) {
+            System.out.println(value);
+        } else if (identifier != null && value != null) {
             if (valueTable.containsKey(identifier)) {
                 if (value.matches("-?\\d+(\\.\\d+)?")) {
                     valueTable.put(identifier, value);
