@@ -628,9 +628,13 @@ public class Interpreter {
         }
     }
 
+    private static final int MAX_ITERATIONS = 200;
+
     private static void whirl(ParseTreeNode node, HashMap<String, String> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
+        int loopCount = 0;
+
         // Check condition first
         for (ParseTreeNode child : node.getChildren()) {
             switch (child.getSymbol()) {
@@ -642,6 +646,10 @@ public class Interpreter {
 
         // If condition is true, execute the statements
         while (condition) {
+            if (++loopCount > MAX_ITERATIONS) {
+                throw new IllegalStateException("Maximum loop iterations exceeded");
+            }
+
             enterScope(scopes);
             statementProcessor(node, valueTable, scopes);
 
@@ -660,7 +668,13 @@ public class Interpreter {
     private static void launchWhirl(ParseTreeNode node, HashMap<String, String> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
+        int loopCount = 0;
+
         do {
+            if (++loopCount > MAX_ITERATIONS) {
+                throw new IllegalStateException("Maximum loop iterations exceeded");
+            }
+
             // Execute the statements
             enterScope(scopes);
             statementProcessor(node, valueTable, scopes);
