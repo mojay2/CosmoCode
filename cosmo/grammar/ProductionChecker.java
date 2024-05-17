@@ -318,35 +318,41 @@ public class ProductionChecker {
     private static void checkLogicalExpressionProduction(String[] stk, List<String[]> dataTable, ParseTreeNode root) {
         removeEmptyValuesInBetween(stk);
 
-        for (int z = 0; z < stk.length - 1; z++) {
+        int z = 0;
+        while (z < stk.length - 1) {
             String original = constructOriginalString(stk, z);
 
             // Check if the current sequence matches the production rule
-            // <logicalExp> -> <relationalExp> <logicalOp> <relationalExp>
-            if (stk[z].equals("relationalExp") && stk[z + 1].equals("logicalOp")
-                    && stk[z + 2].equals("relationalExp")) {
-                // Perform reduction for identifier
-                stk[z] = "logicalExp";
-                stk[z + 1] = "";
-                stk[z + 2] = "";
+            // <logicalExp> ->
+            // <relationalExp> <logicalOp> <relationalExp> ... <logicalOp> <relationalExp>
+            if (stk[z].equals("relationalExp")) {
+                int tempZ = z + 1;
+                while (tempZ < stk.length && (stk[tempZ].equals("logicalOp") || stk[tempZ].equals("relationalExp"))) {
+                    tempZ++;
+                }
 
-                // Add reduction to dataTable
-                dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " +
-                        original, "", "" });
+                if (tempZ - z > 2 && (tempZ - z) % 2 == 1) {
+                    // Perform reduction for identifier
+                    for (int i = z; i < tempZ; i++) {
+                        stk[i] = i == z ? "logicalExp" : "";
+                    }
 
-                // Update Parse Tree
-                ParseTreeNode closePar = root.popChild();
-                ParseTreeNode relationalExp = root.popChild();
-                ParseTreeNode logicalOp = root.popChild();
-                ParseTreeNode relationalExp2 = root.popChild();
-                ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
-                reducedNode.addChild(relationalExp2);
-                reducedNode.addChild(logicalOp);
-                reducedNode.addChild(relationalExp);
-                root.addChild(reducedNode);
-                root.addChild(closePar);
-                return;
+                    // Add reduction to dataTable
+                    dataTable.add(new String[] { "REDUCE TO " + joinWithoutNull(stk) + " <- " +
+                            original, "", "" });
+
+                    // Update Parse Tree
+                    ParseTreeNode closePar = root.popChild();
+                    ParseTreeNode reducedNode = new ParseTreeNode("logicalExp");
+                    for (int i = tempZ - 1; i >= z; i--) {
+                        reducedNode.addChild(root.popChild());
+                    }
+                    root.addChild(reducedNode);
+                    root.addChild(closePar);
+                    z = tempZ - 1;
+                }
             }
+            z++;
         }
     }
 
