@@ -27,9 +27,7 @@ public class Interpreter {
         }
         return null; // Variable not found in any scope
     }
-    
-    
-    
+       
     public static void interpret(ParseTreeNode root, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         if (root == null) {
             return;
@@ -70,8 +68,6 @@ public class Interpreter {
             case "launchWhirlLoop":
                 launchWhirl(root, valueTable, scopes);
                 break;
-
-            // Add more cases for other statement types
             default:
                 for (ParseTreeNode child : root.getChildren()) {
                     interpret(child, valueTable, scopes);
@@ -94,6 +90,18 @@ public class Interpreter {
         } else {
             return getLeafValue(node.getChildren().get(0));
         }
+    }
+
+    private static List<String> getLeaves(ParseTreeNode node) {
+        List<String> leaves = new ArrayList<>();
+        if (node.isLeaf()) {
+            leaves.add(node.getSymbol());
+        } else {
+            for (ParseTreeNode child : node.getChildren()) {
+                leaves.addAll(getLeaves(child));
+            }
+        }
+        return leaves;
     }
 
     private static void declaration(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
@@ -312,18 +320,6 @@ public class Interpreter {
             }
         }
     }    
-
-    private static List<String> getLeaves(ParseTreeNode node) {
-        List<String> leaves = new ArrayList<>();
-        if (node.isLeaf()) {
-            leaves.add(node.getSymbol());
-        } else {
-            for (ParseTreeNode child : node.getChildren()) {
-                leaves.addAll(getLeaves(child));
-            }
-        }
-        return leaves;
-    }
 
     private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable, Stack<HashMap<String, String>> scopes) {
         String identifier = null;

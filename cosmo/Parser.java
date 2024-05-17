@@ -119,8 +119,6 @@ public class Parser {
             }
         }
 
-        // System.out.println("CHECK: " + Arrays.toString(filteredStk));
-
         if (!isValidInput) {
             ArrayList<String> list = new ArrayList<>();
             for (int n = 0; n < stk.length; n++) {
