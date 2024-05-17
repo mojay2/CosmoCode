@@ -530,8 +530,8 @@ public class Interpreter {
     }
 
     private static void orbitNavigatePropel(ParseTreeNode node, HashMap<String, String> valueTable) {
-        boolean condition = true;
-        boolean condition2 = true;
+        Boolean condition = null;
+        Boolean condition2 = null;
 
         // Check condition first
         for (ParseTreeNode child : node.getChildren()) {
@@ -543,13 +543,13 @@ public class Interpreter {
                     for (ParseTreeNode navChild : child.getChildren()) { // Iterate over children of conditionalExp
                         switch (navChild.getSymbol()) {
                             case "conditionalExp":
-                                condition = conditionProcessor(condition, child, valueTable);
+                                condition2 = conditionProcessor(condition, child, valueTable);
                         }
                     }
                     break; // You should break out of the outer loop after processing the conditionalExp
             }
         }
-
+        
         // If condition is true, execute the statements
         if (condition) {
             statementProcessor(node, valueTable);
