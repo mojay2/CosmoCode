@@ -5,9 +5,16 @@ Comet z = 3 ;
 Comet result = x + y + z ;
 
 Orbit ( result <= 15 ) {
+    Comet x = 100 ;
     transmission ( result ) ;
     transmission ( "result is less than or equal to 15" ) ; 
+    transmission ( x ) ;
 } Propel {
+    Comet x = 200 ;
     transmission ( result ) ;
     transmission ( "Result is greater than 15" ) ; 
+    x = x + result ;
+    transmission ( x ) ;
 } ;
+
+transmission ( x ) ;

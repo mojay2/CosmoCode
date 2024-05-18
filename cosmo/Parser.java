@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.Iterator;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 
 public class Parser {
@@ -44,7 +42,6 @@ public class Parser {
         // Define the file path
         String parserFilePath = "./output/parser/output" + fileNumber + ".csv";
         String parseTreeFilePath = "./output/parse_tree/output" + fileNumber + ".txt";
-        String valueTableFilePath = "./output/value_table/output" + fileNumber + ".txt";
 
         // Define a String array to hold the stk and remainingInput
         String[] stk = new String[tokenLength];
@@ -156,8 +153,6 @@ public class Parser {
 
         // Write data to CSV file
         writeOutputToFile(parserFilePath, dataTable);
-        // Write final value table to txt file
-        writeValueTableToFile(valueTableFilePath);
     }
 
     public static String joinWithoutNull(String[] arr) {
@@ -184,18 +179,6 @@ public class Parser {
             // System.out.println("CSV file has been created successfully!");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public void writeValueTableToFile(String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (Map.Entry<String, String> entry : valueTable.entrySet()) {
-                writer.write(entry.getKey() + " : " + entry.getValue());
-                writer.newLine();
-            }
-            // System.out.println("Value table has been written to " + fileName);
-        } catch (IOException e) {
-            System.err.println("Error writing value table to file: " + e.getMessage());
         }
     }
 

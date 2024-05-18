@@ -29,6 +29,11 @@ comp_less_eq
 cmt_15
 sep_cl_par
 sep_op_brac
+comet_token
+id_x
+arith_assign
+cmt_100
+sep_semicolon
 transmission_token
 sep_op_par
 id_result
@@ -39,9 +44,19 @@ sep_op_par
 "result is less than or equal to 15"
 sep_cl_par
 sep_semicolon
+transmission_token
+sep_op_par
+id_x
+sep_cl_par
+sep_semicolon
 sep_cl_brac
 propel_token
 sep_op_brac
+comet_token
+id_x
+arith_assign
+cmt_200
+sep_semicolon
 transmission_token
 sep_op_par
 id_result
@@ -52,5 +67,21 @@ sep_op_par
 "Result is greater than 15"
 sep_cl_par
 sep_semicolon
+id_x
+arith_assign
+id_x
+arith_plus
+id_result
+sep_semicolon
+transmission_token
+sep_op_par
+id_x
+sep_cl_par
+sep_semicolon
 sep_cl_brac
+sep_semicolon
+transmission_token
+sep_op_par
+id_x
+sep_cl_par
 sep_semicolon
