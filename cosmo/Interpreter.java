@@ -322,7 +322,6 @@ public class Interpreter {
                 // Update the valueTable accordingly
                 VariableEntry entry = new VariableEntry(identifier, value, scopes);
                 valueTable.put(identifier, entry);
-                System.out.println("first assignment: " + identifier + " : " + value);
             } else {
                 // Check if the identifier exists in outer scopes
                 boolean foundInOuterScope = false;
@@ -334,7 +333,6 @@ public class Interpreter {
                         VariableEntry entry = new VariableEntry(identifier, value, scopes);
                         valueTable.put(identifier, entry);
                         foundInOuterScope = true;
-                        System.out.println("assignment: " + identifier + " : " + value + " (updated in outer scope)");
                         break;
                     }
                 }
@@ -412,7 +410,6 @@ public class Interpreter {
                         // Update the valueTable accordingly
                         VariableEntry entry = new VariableEntry(identifier, value, scopes);
                         valueTable.put(identifier, entry);
-                        System.out.println("reception: " + identifier + " : " + value);
                     } else {
                         // Check if the identifier exists in outer scopes
                         boolean foundInOuterScope = false;
@@ -424,8 +421,6 @@ public class Interpreter {
                                 VariableEntry entry = new VariableEntry(identifier, value, scopes);
                                 valueTable.put(identifier, entry);
                                 foundInOuterScope = true;
-                                System.out.println(
-                                        "reception: " + identifier + " : " + value + " (updated in outer scope)");
                                 break;
                             }
                         }
