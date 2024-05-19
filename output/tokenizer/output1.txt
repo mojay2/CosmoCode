@@ -29,11 +29,6 @@ comp_less_eq
 cmt_100
 sep_cl_par
 sep_op_brac
-comet_token
-id_x
-arith_assign
-cmt_100
-sep_semicolon
 transmission_token
 sep_op_par
 id_result

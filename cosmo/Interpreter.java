@@ -314,23 +314,34 @@ public class Interpreter {
         }
 
         if (identifier != null && value != null) {
-            // Check if the identifier is declared in any scope
-            boolean found = false;
-            for (int i = scopes.size() - 1; i >= 0; i--) {
-                if (scopes.get(i).containsKey(identifier)) {
-                    // Update the variable in the found scope
-                    scopes.get(i).put(identifier, value);
-                    // Update the valueTable accordingly
-                    VariableEntry entry = new VariableEntry(identifier, value, scopes);
-                    valueTable.put(identifier, entry);
-                    found = true;
-                    break;
-                }
-            }
+            boolean foundInCurrentScope = scopes.peek().containsKey(identifier);
 
-            // If the identifier is not found in any scope, throw an error
-            if (!found) {
-                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not been declared.");
+            if (foundInCurrentScope) {
+                // Update the variable in the current scope
+                scopes.peek().put(identifier, value);
+                // Update the valueTable accordingly
+                VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                valueTable.put(identifier, entry);
+                System.out.println("first assignment: " + identifier + " : " + value);
+            } else {
+                // Check if the identifier exists in outer scopes
+                boolean foundInOuterScope = false;
+                for (int i = scopes.size() - 2; i >= 0; i--) { // Start from the outermost scope
+                    if (scopes.get(i).containsKey(identifier)) {
+                        // Update the variable value in the outer scope
+                        scopes.get(i).put(identifier, value);
+                        // Update the valueTable accordingly
+                        VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                        valueTable.put(identifier, entry);
+                        foundInOuterScope = true;
+                        System.out.println("assignment: " + identifier + " : " + value + " (updated in outer scope)");
+                        break;
+                    }
+                }
+
+                if (!foundInOuterScope) {
+                    throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not been declared.");
+                }
             }
         }
     }
@@ -368,8 +379,8 @@ public class Interpreter {
 
     private static void reception(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
-        String statement = null;
         String identifier = null;
+        String statement = null;
         String value = null;
 
         for (ParseTreeNode child : node.getChildren()) {
@@ -387,26 +398,47 @@ public class Interpreter {
             }
         }
 
-        if (lookupVariable(identifier, scopes) != null) {
-            System.out.print(statement); // Print user prompt
-            value = scanner.nextLine(); // Read user input using the class-level scanner
+        if (identifier != null && statement != null) {
+            if (lookupVariable(identifier, scopes) != null) {
+                System.out.print(statement); // Print user prompt
+                value = scanner.nextLine(); // Read user input using the class-level scanner
 
-            if (value.matches("-?\\d+(\\.\\d+)?")) {
-                // Update the value in the current scope
-                for (int i = scopes.size() - 1; i >= 0; i--) {
-                    if (scopes.get(i).containsKey(identifier)) {
-                        // Create a VariableEntry and set its value
-                        VariableEntry entry = new VariableEntry(identifier, value, scopes);
-                        // Add the VariableEntry to the valueTable
-                        valueTable.put(identifier, entry);
-                        // Also add the identifier and value to the current scope
+                if (value.matches("-?\\d+(\\.\\d+)?")) {
+                    boolean foundInCurrentScope = scopes.peek().containsKey(identifier);
+
+                    if (foundInCurrentScope) {
+                        // Update the variable in the current scope
                         scopes.peek().put(identifier, value);
-                        break;
+                        // Update the valueTable accordingly
+                        VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                        valueTable.put(identifier, entry);
+                        System.out.println("reception: " + identifier + " : " + value);
+                    } else {
+                        // Check if the identifier exists in outer scopes
+                        boolean foundInOuterScope = false;
+                        for (int i = scopes.size() - 2; i >= 0; i--) { // Start from the outermost scope
+                            if (scopes.get(i).containsKey(identifier)) {
+                                // Update the variable value in the outer scope
+                                scopes.get(i).put(identifier, value);
+                                // Update the valueTable accordingly
+                                VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                                valueTable.put(identifier, entry);
+                                foundInOuterScope = true;
+                                System.out.println(
+                                        "reception: " + identifier + " : " + value + " (updated in outer scope)");
+                                break;
+                            }
+                        }
+
+                        if (!foundInOuterScope) {
+                            throw new IllegalStateException(
+                                    "RECEPTION ERROR: " + identifier + " has not been declared.");
+                        }
                     }
+                } else {
+                    throw new IllegalStateException(
+                            "RECEPTION ERROR: Reception input should be a Comet (integer).");
                 }
-            } else {
-                throw new IllegalStateException(
-                        "RECEPTION ERROR: Reception input should be a Comet (integer).");
             }
         }
     }

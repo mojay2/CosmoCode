@@ -22,7 +22,7 @@ Orbit ( var1 > var2 ) {
   transmission ( "equal" ) ;
 } ;
 
-transmission ( "the old value of var1 for outside the scope is " ) ;
+transmission ( "the new value of var1 for outside the scope is " ) ;
 transmission ( var1 ) ;
 
 transmission ( "end" ) ; 

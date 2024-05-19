@@ -1,9 +1,8 @@
 Scope 1:
-x : 444
 
 Scope 2:
 result : 18
-x : 5
+x : 45
 y : 10
 z : 3
 

@@ -119,7 +119,7 @@ sep_cl_brac
 sep_semicolon
 transmission_token
 sep_op_par
-"the old value of var1 for outside the scope is "
+"the new value of var1 for outside the scope is "
 sep_cl_par
 sep_semicolon
 transmission_token
