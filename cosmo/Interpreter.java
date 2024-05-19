@@ -354,42 +354,47 @@ public class Interpreter {
     }
 
     private static void reception(ParseTreeNode node, HashMap<String, String> valueTable,
-            Stack<HashMap<String, String>> scopes) {
-        String statement = null;
-        String identifier = null;
-        String value = null;
+                              Stack<HashMap<String, String>> scopes) {
+    String statement = null;
+    String identifier = null;
+    String value = null;
 
-        for (ParseTreeNode child : node.getChildren()) {
-            switch (child.getSymbol()) {
-                case "identifier":
-                    identifier = getLeafValue(child);
-                    if (lookupVariable(identifier, scopes) == null) {
-                        throw new IllegalStateException(
-                                "RECEPTION ERROR: " + identifier + " has not yet been declared.");
-                    }
-                    break;
-                case "string":
-                    statement = getLeafValue(child).replace("\"", "");
-                    break;
-            }
-        }
-
-        if (lookupVariable(identifier, scopes) != null) {
-            System.out.print(statement); // Print user prompt
-            value = scanner.nextLine(); // Read user input using the class-level scanner
-
-            if (value.matches("-?\\d+(\\.\\d+)?")) {
-                for (int i = scopes.size() - 1; i >= 0; i--) {
-                    if (scopes.get(i).containsKey(identifier)) {
-                        scopes.get(i).put(identifier, value);
-                        break;
-                    }
+    for (ParseTreeNode child : node.getChildren()) {
+        switch (child.getSymbol()) {
+            case "identifier":
+                identifier = getLeafValue(child);
+                if (lookupVariable(identifier, scopes) == null) {
+                    throw new IllegalStateException(
+                            "RECEPTION ERROR: " + identifier + " has not yet been declared.");
                 }
-            } else {
-                System.out.println("RECEPTION ERROR: Reception input should be a Comet (integer).");
-            }
+                break;
+            case "string":
+                statement = getLeafValue(child).replace("\"", "");
+                break;
         }
     }
+
+    if (lookupVariable(identifier, scopes) != null) {
+        System.out.print(statement); // Print user prompt
+        value = scanner.nextLine(); // Read user input using the class-level scanner
+
+        if (value.matches("-?\\d+(\\.\\d+)?")) {
+            // Update the value in the current scope
+            for (int i = scopes.size() - 1; i >= 0; i--) {
+                if (scopes.get(i).containsKey(identifier)) {
+                    scopes.get(i).put(identifier, value);
+                    // Also update the value in the valueTable
+                    valueTable.put(identifier, value);
+                    break;
+                }
+            }
+        } else {
+            throw new IllegalStateException(
+                    "RECEPTION ERROR: Reception input should be a Comet (integer).");
+        }
+    }
+}
+
 
     private static Boolean logical(ParseTreeNode node, HashMap<String, String> valueTable) {
         Boolean leftValue = null;

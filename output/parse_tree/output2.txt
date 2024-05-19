@@ -29,6 +29,22 @@ Program 2
 |____|____|____sep_cl_par
 |____|____|____sep_semicolon
 |____expr
+|____|____transmissionStmt
+|____|____|____transmission_token
+|____|____|____sep_op_par
+|____|____|____string
+|____|____|____|____"the new value of var1 is "
+|____|____|____sep_cl_par
+|____|____|____sep_semicolon
+|____expr
+|____|____transmissionStmt
+|____|____|____transmission_token
+|____|____|____sep_op_par
+|____|____|____identifier
+|____|____|____|____id_var1
+|____|____|____sep_cl_par
+|____|____|____sep_semicolon
+|____expr
 |____|____decStmt
 |____|____|____comet_token
 |____|____|____identifier
@@ -87,7 +103,7 @@ Program 2
 |____|____|____|____|____transmission_token
 |____|____|____|____|____sep_op_par
 |____|____|____|____|____string
-|____|____|____|____|____|____"greater!"
+|____|____|____|____|____|____"var 1 is greater!"
 |____|____|____|____|____sep_cl_par
 |____|____|____|____|____sep_semicolon
 |____|____|____expr
@@ -98,6 +114,33 @@ Program 2
 |____|____|____|____|____arith_assign
 |____|____|____|____|____comet_literal
 |____|____|____|____|____|____cmt_10
+|____|____|____|____|____sep_semicolon
+|____|____|____expr
+|____|____|____|____receptionStmt
+|____|____|____|____|____identifier
+|____|____|____|____|____|____id_var1
+|____|____|____|____|____arith_assign
+|____|____|____|____|____reception_token
+|____|____|____|____|____sep_op_par
+|____|____|____|____|____string
+|____|____|____|____|____|____"Enter a number for var1 "
+|____|____|____|____|____sep_cl_par
+|____|____|____|____|____sep_semicolon
+|____|____|____expr
+|____|____|____|____transmissionStmt
+|____|____|____|____|____transmission_token
+|____|____|____|____|____sep_op_par
+|____|____|____|____|____string
+|____|____|____|____|____|____"the new value of var1 is "
+|____|____|____|____|____sep_cl_par
+|____|____|____|____|____sep_semicolon
+|____|____|____expr
+|____|____|____|____transmissionStmt
+|____|____|____|____|____transmission_token
+|____|____|____|____|____sep_op_par
+|____|____|____|____|____identifier
+|____|____|____|____|____|____id_var1
+|____|____|____|____|____sep_cl_par
 |____|____|____|____|____sep_semicolon
 |____|____|____sep_cl_brac
 |____|____navigateStmt
@@ -119,7 +162,7 @@ Program 2
 |____|____|____|____|____|____transmission_token
 |____|____|____|____|____|____sep_op_par
 |____|____|____|____|____|____string
-|____|____|____|____|____|____|____"lesser!"
+|____|____|____|____|____|____|____"var 1 is lesser!"
 |____|____|____|____|____|____sep_cl_par
 |____|____|____|____|____|____sep_semicolon
 |____|____|____|____expr
@@ -167,6 +210,14 @@ Program 2
 |____|____|____|____|____|____sep_semicolon
 |____|____|____|____sep_cl_brac
 |____|____sep_semicolon
+|____expr
+|____|____transmissionStmt
+|____|____|____transmission_token
+|____|____|____sep_op_par
+|____|____|____identifier
+|____|____|____|____id_var1
+|____|____|____sep_cl_par
+|____|____|____sep_semicolon
 |____expr
 |____|____transmissionStmt
 |____|____|____transmission_token
