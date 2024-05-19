@@ -1,34 +1,58 @@
 package cosmo;
 
+import cosmo.interpreter.VariableEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
 
 public class Interpreter {
     private static Scanner scanner = new Scanner(System.in);
 
+    // Method to enter a new scope
     private static void enterScope(Stack<HashMap<String, String>> scopes) {
-        scopes.push(new HashMap<>());
+        // Create a new scope (HashMap) and push it onto the stack
+        HashMap<String, String> newScope = new HashMap<>();
+        scopes.push(newScope);
     }
 
-    private static void exitScope(Stack<HashMap<String, String>> scopes) {
+    // Method to exit the current scope
+    public static void exitScope(Stack<HashMap<String, String>> scopes) {
+        // Check if there is at least one scope to exit
         if (!scopes.isEmpty()) {
-            scopes.pop();
+            // Pop the current scope from the stack
+            HashMap<String, String> currentScope = scopes.pop();
+            // Add the popped scope to the global scopedVariablesList
+            Parser.scopedVariablesList.add(new HashMap<>(currentScope));
         }
     }
 
+    // Method to assign a variable to the current scope
+    public static void assignVariable(String key, String value, Stack<HashMap<String, String>> scopes) {
+        // Check if there is at least one scope in the stack
+        if (!scopes.isEmpty()) {
+            // Assign the variable to the current scope (top of the stack)
+            scopes.peek().put(key, value);
+        }
+    }
+
+    // Method to look up a variable by its identifier in the scopes
     private static String lookupVariable(String identifier, Stack<HashMap<String, String>> scopes) {
+        // Iterate through the scopes starting from the top of the stack
         for (int i = scopes.size() - 1; i >= 0; i--) {
+            // Check if the variable exists in the current scope
             if (scopes.get(i).containsKey(identifier)) {
+                // Return the value of the variable
                 return scopes.get(i).get(identifier);
             }
         }
-        return null; // Variable not found in any scope
+        // Return null if the variable is not found in any scope
+        return null;
     }
 
-    public static void interpret(ParseTreeNode root, HashMap<String, String> valueTable,
+    public static void interpret(ParseTreeNode root, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         if (root == null) {
             return;
@@ -105,7 +129,7 @@ public class Interpreter {
         return leaves;
     }
 
-    private static void declaration(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void declaration(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         String identifier = null;
         String value = null;
@@ -131,13 +155,12 @@ public class Interpreter {
         if (identifier != null && value != null) {
             // Check if the identifier is already declared in the current scope
             if (!scopes.peek().containsKey(identifier)) {
-                // Check if the value is a valid number or a declared variable
-                if (value.matches("-?\\d+(\\.\\d+)?") || lookupVariable(value, scopes) != null) {
-                    scopes.peek().put(identifier, value);
-                    valueTable.put(identifier, value); // Update valueTable
-                } else {
-                    throw new IllegalStateException("DECLARATION ERROR: " + value + " has not yet been declared.");
-                }
+                // Create a VariableEntry and set its value
+                VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                // Add the VariableEntry to the valueTable
+                valueTable.put(identifier, entry);
+                // Also add the identifier and value to the current scope
+                scopes.peek().put(identifier, value);
             } else {
                 throw new IllegalStateException(
                         "DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
@@ -145,7 +168,7 @@ public class Interpreter {
         }
     }
 
-    private static String arithmetic(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static String arithmetic(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         List<String> leaves = getLeaves(node);
         int result = 0;
@@ -267,7 +290,7 @@ public class Interpreter {
         return Integer.toString(result);
     }
 
-    private static void assignment(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void assignment(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         String identifier = null;
         String value = null;
@@ -292,37 +315,27 @@ public class Interpreter {
 
         if (identifier != null && value != null) {
             // Check if the identifier is declared in any scope
-            if (lookupVariable(identifier, scopes) != null) {
-                // Check if the value is a valid number or a declared variable
-                if (value.matches("-?\\d+(\\.\\d+)?")) {
-                    // Update the variable in the most specific scope
-                    for (int i = scopes.size() - 1; i >= 0; i--) {
-                        if (scopes.get(i).containsKey(identifier)) {
-                            scopes.get(i).put(identifier, value);
-                            valueTable.put(identifier, value); // Update valueTable
-                            break;
-                        }
-                    }
-                } else if (lookupVariable(value, scopes) != null) {
-                    String assignedValue = lookupVariable(value, scopes);
-                    // Update the variable in the most specific scope
-                    for (int i = scopes.size() - 1; i >= 0; i--) {
-                        if (scopes.get(i).containsKey(identifier)) {
-                            scopes.get(i).put(identifier, assignedValue);
-                            valueTable.put(identifier, assignedValue); // Update valueTable
-                            break;
-                        }
-                    }
-                } else {
-                    throw new IllegalStateException("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
+            boolean found = false;
+            for (int i = scopes.size() - 1; i >= 0; i--) {
+                if (scopes.get(i).containsKey(identifier)) {
+                    // Update the variable in the found scope
+                    scopes.get(i).put(identifier, value);
+                    // Update the valueTable accordingly
+                    VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                    valueTable.put(identifier, entry);
+                    found = true;
+                    break;
                 }
-            } else {
-                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
+            }
+
+            // If the identifier is not found in any scope, throw an error
+            if (!found) {
+                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not been declared.");
             }
         }
     }
 
-    private static void transmission(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void transmission(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         String identifier = null;
         String string = null;
@@ -353,50 +366,52 @@ public class Interpreter {
         }
     }
 
-    private static void reception(ParseTreeNode node, HashMap<String, String> valueTable,
-                              Stack<HashMap<String, String>> scopes) {
-    String statement = null;
-    String identifier = null;
-    String value = null;
+    private static void reception(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
+            Stack<HashMap<String, String>> scopes) {
+        String statement = null;
+        String identifier = null;
+        String value = null;
 
-    for (ParseTreeNode child : node.getChildren()) {
-        switch (child.getSymbol()) {
-            case "identifier":
-                identifier = getLeafValue(child);
-                if (lookupVariable(identifier, scopes) == null) {
-                    throw new IllegalStateException(
-                            "RECEPTION ERROR: " + identifier + " has not yet been declared.");
-                }
-                break;
-            case "string":
-                statement = getLeafValue(child).replace("\"", "");
-                break;
-        }
-    }
-
-    if (lookupVariable(identifier, scopes) != null) {
-        System.out.print(statement); // Print user prompt
-        value = scanner.nextLine(); // Read user input using the class-level scanner
-
-        if (value.matches("-?\\d+(\\.\\d+)?")) {
-            // Update the value in the current scope
-            for (int i = scopes.size() - 1; i >= 0; i--) {
-                if (scopes.get(i).containsKey(identifier)) {
-                    scopes.get(i).put(identifier, value);
-                    // Also update the value in the valueTable
-                    valueTable.put(identifier, value);
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    identifier = getLeafValue(child);
+                    if (lookupVariable(identifier, scopes) == null) {
+                        throw new IllegalStateException(
+                                "RECEPTION ERROR: " + identifier + " has not yet been declared.");
+                    }
                     break;
-                }
+                case "string":
+                    statement = getLeafValue(child).replace("\"", "");
+                    break;
             }
-        } else {
-            throw new IllegalStateException(
-                    "RECEPTION ERROR: Reception input should be a Comet (integer).");
+        }
+
+        if (lookupVariable(identifier, scopes) != null) {
+            System.out.print(statement); // Print user prompt
+            value = scanner.nextLine(); // Read user input using the class-level scanner
+
+            if (value.matches("-?\\d+(\\.\\d+)?")) {
+                // Update the value in the current scope
+                for (int i = scopes.size() - 1; i >= 0; i--) {
+                    if (scopes.get(i).containsKey(identifier)) {
+                        // Create a VariableEntry and set its value
+                        VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                        // Add the VariableEntry to the valueTable
+                        valueTable.put(identifier, entry);
+                        // Also add the identifier and value to the current scope
+                        scopes.peek().put(identifier, value);
+                        break;
+                    }
+                }
+            } else {
+                throw new IllegalStateException(
+                        "RECEPTION ERROR: Reception input should be a Comet (integer).");
+            }
         }
     }
-}
 
-
-    private static Boolean logical(ParseTreeNode node, HashMap<String, String> valueTable) {
+    private static Boolean logical(ParseTreeNode node, HashMap<String, VariableEntry> valueTable) {
         Boolean leftValue = null;
         Boolean rightValue = null;
         String operator = null;
@@ -425,7 +440,7 @@ public class Interpreter {
         return result;
     }
 
-    private static Boolean relational(ParseTreeNode node, HashMap<String, String> valueTable) {
+    private static Boolean relational(ParseTreeNode node, HashMap<String, VariableEntry> valueTable) {
         String leftValue = null;
         String rightValue = null;
         String operator = null;
@@ -434,11 +449,16 @@ public class Interpreter {
             switch (child.getSymbol()) {
                 case "identifier":
                     String identifier = getLeafValue(child);
-                    if (leftValue == null) {
-                        leftValue = valueTable.get(identifier);
+                    VariableEntry entry = valueTable.get(identifier);
+                    if (entry != null) {
+                        if (leftValue == null) {
+                            leftValue = entry.getValue();
+                        } else {
+                            rightValue = entry.getValue();
+                        }
                     } else {
-                        rightValue = valueTable.get(identifier);
-
+                        throw new IllegalStateException(
+                                "Identifier '" + identifier + "' not found in the value table.");
                     }
                     break;
                 case "comet_literal":
@@ -455,8 +475,12 @@ public class Interpreter {
             }
         }
 
-        if (leftValue == null || rightValue == null || operator == null) {
-            throw new IllegalStateException("RELATIONAL ERROR: Invalid relational expression due to null value.");
+        if (leftValue == null) {
+            throw new IllegalStateException("RELATIONAL ERROR: Left value is null.");
+        } else if (rightValue == null) {
+            throw new IllegalStateException("RELATIONAL ERROR: Right value is null.");
+        } else if (operator == null) {
+            throw new IllegalStateException("RELATIONAL ERROR: Operator is null.");
         }
 
         double left = Double.parseDouble(leftValue);
@@ -480,7 +504,7 @@ public class Interpreter {
         }
     }
 
-    private static void statementProcessor(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void statementProcessor(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         for (ParseTreeNode child : node.getChildren()) { // Iterate over children of stmt
             switch (child.getSymbol()) {
@@ -514,7 +538,7 @@ public class Interpreter {
     }
 
     private static boolean conditionProcessor(Boolean condition, ParseTreeNode node,
-            HashMap<String, String> valueTable) {
+            HashMap<String, VariableEntry> valueTable) {
         for (ParseTreeNode condChild : node.getChildren()) { // Iterate over children of conditionalExp
             switch (condChild.getSymbol()) {
                 case "logicalExp":
@@ -536,7 +560,7 @@ public class Interpreter {
         return condition;
     }
 
-    private static void orbit(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void orbit(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
 
@@ -557,7 +581,7 @@ public class Interpreter {
         }
     }
 
-    private static void orbitPropel(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void orbitPropel(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
 
@@ -588,7 +612,7 @@ public class Interpreter {
         }
     }
 
-    private static void orbitNavigatePropel(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void orbitNavigatePropel(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         Boolean condition = null;
         Boolean condition2 = null;
@@ -640,7 +664,7 @@ public class Interpreter {
 
     private static final int MAX_ITERATIONS = 200;
 
-    private static void whirl(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void whirl(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
         int loopCount = 0;
@@ -654,13 +678,14 @@ public class Interpreter {
             }
         }
 
+        enterScope(scopes);
+
         // If condition is true, execute the statements
         while (condition) {
             if (++loopCount > MAX_ITERATIONS) {
                 throw new IllegalStateException("Maximum loop iterations exceeded");
             }
 
-            enterScope(scopes);
             statementProcessor(node, valueTable, scopes);
 
             // Re-evaluate the condition
@@ -671,11 +696,12 @@ public class Interpreter {
                         break;
                 }
             }
-            exitScope(scopes);
         }
+
+        exitScope(scopes);
     }
 
-    private static void launchWhirl(ParseTreeNode node, HashMap<String, String> valueTable,
+    private static void launchWhirl(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         boolean condition = true;
         int loopCount = 0;

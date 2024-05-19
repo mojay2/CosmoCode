@@ -1,4 +1,4 @@
-Program 1
+Program
 |____expr
 |____|____decStmt
 |____|____|____comet_token
@@ -80,7 +80,7 @@ Program 1
 |____|____|____|____|____transmission_token
 |____|____|____|____|____sep_op_par
 |____|____|____|____|____string
-|____|____|____|____|____|____"result is less than or equal to 15"
+|____|____|____|____|____|____"result is less than or equal to 100"
 |____|____|____|____|____sep_cl_par
 |____|____|____|____|____sep_semicolon
 |____|____|____expr
@@ -129,7 +129,7 @@ Program 1
 |____|____|____|____|____|____transmission_token
 |____|____|____|____|____|____sep_op_par
 |____|____|____|____|____|____string
-|____|____|____|____|____|____|____"Result is greater than 15"
+|____|____|____|____|____|____|____"Result is greater than 100"
 |____|____|____|____|____|____sep_cl_par
 |____|____|____|____|____|____sep_semicolon
 |____|____|____|____expr

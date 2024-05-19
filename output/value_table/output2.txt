@@ -1,0 +1,10 @@
+Scope 1:
+var6 : 10
+var1 : 444
+
+Scope 2:
+var4 : 339
+var3 : 100
+var2 : 3
+var1 : 333
+

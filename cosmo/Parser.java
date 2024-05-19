@@ -1,6 +1,7 @@
 package cosmo;
 
 import cosmo.grammar.ProductionChecker;
+import cosmo.interpreter.VariableEntry;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,15 +9,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 
 public class Parser {
     private String[] tokens;
-    private HashMap<String, String> valueTable = new HashMap<>();
+    private HashMap<String, VariableEntry> valueTable = new HashMap<>();
     private static Stack<HashMap<String, String>> scopes = new Stack<>();
+    public static List<Map<String, String>> scopedVariablesList = new ArrayList<>();
 
     public Parser(String[] tokens) {
         this.tokens = tokens;
@@ -26,7 +32,7 @@ public class Parser {
 
     int tokenLength = 0;
 
-    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root, HashMap<String, String> valueTable) {
+    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root, HashMap<String, VariableEntry> valueTable2) {
         ProductionChecker.checkProductions(stk, dataTable, root);
     }
 
@@ -42,12 +48,13 @@ public class Parser {
         // Define the file path
         String parserFilePath = "./output/parser/output" + fileNumber + ".csv";
         String parseTreeFilePath = "./output/parse_tree/output" + fileNumber + ".txt";
+        String valueTableFilePath = "./output/value_table/output" + fileNumber + ".txt";
 
         // Define a String array to hold the stk and remainingInput
         String[] stk = new String[tokenLength];
         Arrays.fill(stk, ""); // Initialize stk with empty strings
 
-        ParseTreeNode root = new ParseTreeNode("Program " + fileNumber);
+        ParseTreeNode root = new ParseTreeNode("Program");
         // Define an ArrayList to hold data
         List<String[]> dataTable = new ArrayList<>();
 
@@ -143,7 +150,7 @@ public class Parser {
             } else {
                 System.out.println("Reject\n");
                 System.out.println("\n-------------------------------------------------\r\n" + //
-                                        "\n");
+                        "\n");
                 dataTable.add(new String[] { "REJECT", "", "" });
                 out.println("Parse tree cannot be generated for the given input");
             }
@@ -153,6 +160,8 @@ public class Parser {
 
         // Write data to CSV file
         writeOutputToFile(parserFilePath, dataTable);
+        // Write final value table to txt file
+        writeValueTableToFile(valueTableFilePath);
     }
 
     public static String joinWithoutNull(String[] arr) {
@@ -180,6 +189,31 @@ public class Parser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void writeValueTableToFile(String fileName) {
+        // Try-with-resources to ensure BufferedWriter is closed after usage
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            int scopeNumber = 1; // Initialize the scope number
+            for (Map<String, String> scopedVariables : scopedVariablesList) {
+                // Write the scope header
+                writer.write("Scope " + scopeNumber + ":");
+                writer.newLine();
+                // Write each key-value pair in the current scope
+                for (Map.Entry<String, String> entry : scopedVariables.entrySet()) {
+                    writer.write(entry.getKey() + " : " + entry.getValue());
+                    writer.newLine();
+                }
+                writer.newLine(); // Add a blank line after each scope to separate them
+                scopeNumber++; // Increment the scope number
+            }
+        } catch (IOException e) {
+            // Print an error message if an IOException occurs
+            System.err.println("Error writing value table to file: " + e.getMessage());
+        }
+
+        // Clear all the tables after writing the output file
+        scopedVariablesList.clear();
     }
 
     static ArrayList<String> checkProds(ArrayList<String> tokenList) {
