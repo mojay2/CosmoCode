@@ -41,7 +41,7 @@ sep_cl_par
 sep_semicolon
 transmission_token
 sep_op_par
-"result is less than or equal to 15"
+"result is less than or equal to 100"
 sep_cl_par
 sep_semicolon
 id_x
@@ -54,6 +54,26 @@ sep_semicolon
 transmission_token
 sep_op_par
 id_x
+sep_cl_par
+sep_semicolon
+comet_token
+id_newResult
+arith_assign
+cmt_0
+sep_semicolon
+id_newResult
+arith_assign
+id_x
+arith_mult
+cmt_5
+arith_plus
+cmt_10
+arith_minus
+cmt_2
+sep_semicolon
+transmission_token
+sep_op_par
+id_newResult
 sep_cl_par
 sep_semicolon
 sep_cl_brac
@@ -71,7 +91,7 @@ sep_cl_par
 sep_semicolon
 transmission_token
 sep_op_par
-"Result is greater than 15"
+"Result is greater than 100"
 sep_cl_par
 sep_semicolon
 id_x

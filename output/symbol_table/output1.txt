@@ -16,6 +16,7 @@ Whirl : whirl_token
 * : mult
 Voyage : voyage_token
 + : plus
+newResult : id_newResult
 , : comma
 - : minus
 Launch : launchwhirl_token

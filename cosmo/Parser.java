@@ -1,6 +1,7 @@
 package cosmo;
 
 import cosmo.grammar.ProductionChecker;
+import cosmo.interpreter.VariableEntry;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,14 +9,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 
 public class Parser {
     private String[] tokens;
-    private HashMap<String, String> valueTable = new HashMap<>();
+    private HashMap<String, VariableEntry> valueTable = new HashMap<>();
     private static Stack<HashMap<String, String>> scopes = new Stack<>();
 
     public Parser(String[] tokens) {
@@ -26,7 +31,7 @@ public class Parser {
 
     int tokenLength = 0;
 
-    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root, HashMap<String, String> valueTable) {
+    void check(String[] stk, List<String[]> dataTable, ParseTreeNode root, HashMap<String, VariableEntry> valueTable2) {
         ProductionChecker.checkProductions(stk, dataTable, root);
     }
 
@@ -42,6 +47,7 @@ public class Parser {
         // Define the file path
         String parserFilePath = "./output/parser/output" + fileNumber + ".csv";
         String parseTreeFilePath = "./output/parse_tree/output" + fileNumber + ".txt";
+        String valueTableFilePath = "./output/value_table/output" + fileNumber + ".txt";
 
         // Define a String array to hold the stk and remainingInput
         String[] stk = new String[tokenLength];
@@ -153,6 +159,8 @@ public class Parser {
 
         // Write data to CSV file
         writeOutputToFile(parserFilePath, dataTable);
+        // Write final value table to txt file
+        writeValueTableToFile(valueTableFilePath, valueTable);
     }
 
     public static String joinWithoutNull(String[] arr) {
@@ -181,6 +189,25 @@ public class Parser {
             e.printStackTrace();
         }
     }
+
+    public void writeValueTableToFile(String fileName, HashMap<String, VariableEntry> valueTable) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            printValueTable(writer, valueTable);
+        } catch (IOException e) {
+            System.err.println("Error writing value table to file: " + e.getMessage());
+        }
+    }
+    
+    public static void printValueTable(BufferedWriter writer, HashMap<String, VariableEntry> valueTable) throws IOException {
+        writer.write("Value Table Contents:");
+        writer.newLine();
+        for (Map.Entry<String, VariableEntry> entry : valueTable.entrySet()) {
+            String identifier = entry.getKey();
+            VariableEntry variableEntry = entry.getValue();
+            writer.write("Identifier: " + identifier + ", VariableEntry: " + variableEntry);
+            writer.newLine();
+        }
+    }    
 
     static ArrayList<String> checkProds(ArrayList<String> tokenList) {
         String action = "REDUCE TO -> ";

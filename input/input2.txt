@@ -12,11 +12,17 @@ Comet var4 = var1 + var2 * 2 ;
 Orbit ( var1 > var2 ) {
   transmission ( "var 1 is greater!" ) ;
   Comet var6 = 10 ;
+  var1 = reception ( "Enter a number for var1 " ) ;
+  transmission ( "the new value of var1 for this orbit scope is " ) ;
+  transmission ( var1 ) ;
 } Navigate (  var1 < var2 ) {
   transmission ( "var 1 is lesser!" ) ;
   Comet var6 = var1 * 10 + 50 * 10 + 50 - 20 ;
 } Propel {
   transmission ( "equal" ) ;
 } ;
+
+transmission ( "the old value of var1 for outside the scope is " ) ;
+transmission ( var1 ) ;
 
 transmission ( "end" ) ; 

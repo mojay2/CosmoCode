@@ -1,0 +1,6 @@
+Value Table Contents:
+Identifier: var6, VariableEntry: VariableEntry{value='10', scopes=[{result=18, x=5, y=10, z=3}, {var4=228, var3=100, var2=3, var1=222}]}
+Identifier: var4, VariableEntry: VariableEntry{value='228', scopes=[{result=18, x=5, y=10, z=3}, {var4=228, var3=100, var2=3, var1=222}]}
+Identifier: var3, VariableEntry: VariableEntry{value='100', scopes=[{result=18, x=5, y=10, z=3}, {var4=228, var3=100, var2=3, var1=222}]}
+Identifier: var2, VariableEntry: VariableEntry{value='3', scopes=[{result=18, x=5, y=10, z=3}, {var4=228, var3=100, var2=3, var1=222}]}
+Identifier: var1, VariableEntry: VariableEntry{value='333', scopes=[{result=18, x=5, y=10, z=3}, {var4=228, var3=100, var2=3, var1=222}]}

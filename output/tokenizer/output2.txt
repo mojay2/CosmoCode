@@ -71,7 +71,7 @@ sep_cl_par
 sep_semicolon
 transmission_token
 sep_op_par
-"the new value of var1 is "
+"the new value of var1 for this orbit scope is "
 sep_cl_par
 sep_semicolon
 transmission_token
@@ -116,6 +116,11 @@ sep_op_par
 sep_cl_par
 sep_semicolon
 sep_cl_brac
+sep_semicolon
+transmission_token
+sep_op_par
+"the old value of var1 for outside the scope is "
+sep_cl_par
 sep_semicolon
 transmission_token
 sep_op_par
