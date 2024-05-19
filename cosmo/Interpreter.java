@@ -733,13 +733,14 @@ public class Interpreter {
         boolean condition = true;
         int loopCount = 0;
 
+        enterScope(scopes);
+
         do {
             if (++loopCount > MAX_ITERATIONS) {
                 throw new IllegalStateException("Maximum loop iterations exceeded");
             }
 
             // Execute the statements
-            enterScope(scopes);
             statementProcessor(node, valueTable, scopes);
 
             // Evaluate the condition
@@ -751,7 +752,8 @@ public class Interpreter {
                         break;
                 }
             }
-            exitScope(scopes);
         } while (condition);
+
+        exitScope(scopes);
     }
 }
