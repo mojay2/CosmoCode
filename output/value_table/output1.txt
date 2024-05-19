@@ -1,6 +1,14 @@
-Value Table Contents:
-Identifier: result, VariableEntry: VariableEntry{value='18', scopes=[{result=18, x=5, y=10, z=3}]}
-Identifier: x, VariableEntry: VariableEntry{value='15', scopes=[{result=18, x=5, y=10, z=3}]}
-Identifier: y, VariableEntry: VariableEntry{value='10', scopes=[{result=18, x=5, y=10, z=3}]}
-Identifier: z, VariableEntry: VariableEntry{value='3', scopes=[{result=18, x=5, y=10, z=3}]}
-Identifier: newResult, VariableEntry: VariableEntry{value='83', scopes=[{result=18, x=5, y=10, z=3}]}
+Scope 1:
+x : 333
+newResult : 1673
+
+Scope 2:
+x : 222
+newResult : 1118
+
+Scope 3:
+result : 18
+x : 5
+y : 10
+z : 3
+

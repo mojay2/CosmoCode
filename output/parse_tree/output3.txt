@@ -1,4 +1,4 @@
-Program 3
+Program
 |____expr
 |____|____decStmt
 |____|____|____comet_token

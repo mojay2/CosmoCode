@@ -11,23 +11,45 @@ import java.util.Stack;
 public class Interpreter {
     private static Scanner scanner = new Scanner(System.in);
 
+    // Method to enter a new scope
     private static void enterScope(Stack<HashMap<String, String>> scopes) {
-        scopes.push(new HashMap<>());
+        // Create a new scope (HashMap) and push it onto the stack
+        HashMap<String, String> newScope = new HashMap<>();
+        scopes.push(newScope);
     }
 
-    private static void exitScope(Stack<HashMap<String, String>> scopes) {
+    // Method to exit the current scope
+    public static void exitScope(Stack<HashMap<String, String>> scopes) {
+        // Check if there is at least one scope to exit
         if (!scopes.isEmpty()) {
-            scopes.pop();
+            // Pop the current scope from the stack
+            HashMap<String, String> currentScope = scopes.pop();
+            // Add the popped scope to the global scopedVariablesList
+            Parser.scopedVariablesList.add(new HashMap<>(currentScope));
         }
     }
 
+    // Method to assign a variable to the current scope
+    public static void assignVariable(String key, String value, Stack<HashMap<String, String>> scopes) {
+        // Check if there is at least one scope in the stack
+        if (!scopes.isEmpty()) {
+            // Assign the variable to the current scope (top of the stack)
+            scopes.peek().put(key, value);
+        }
+    }
+
+    // Method to look up a variable by its identifier in the scopes
     private static String lookupVariable(String identifier, Stack<HashMap<String, String>> scopes) {
+        // Iterate through the scopes starting from the top of the stack
         for (int i = scopes.size() - 1; i >= 0; i--) {
+            // Check if the variable exists in the current scope
             if (scopes.get(i).containsKey(identifier)) {
+                // Return the value of the variable
                 return scopes.get(i).get(identifier);
             }
         }
-        return null; // Variable not found in any scope
+        // Return null if the variable is not found in any scope
+        return null;
     }
 
     public static void interpret(ParseTreeNode root, HashMap<String, VariableEntry> valueTable,
@@ -107,55 +129,45 @@ public class Interpreter {
         return leaves;
     }
 
-    public static void printValueTable(HashMap<String, VariableEntry> valueTable) {
-        System.out.println("Value Table Contents:");
-        for (Map.Entry<String, VariableEntry> entry : valueTable.entrySet()) {
-            String identifier = entry.getKey();
-            VariableEntry variableEntry = entry.getValue();
-            System.out.println("Identifier: " + identifier + ", VariableEntry: " + variableEntry);
-        }
-    }
-
     private static void declaration(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
-                                Stack<HashMap<String, String>> scopes) {
-    String identifier = null;
-    String value = null;
+            Stack<HashMap<String, String>> scopes) {
+        String identifier = null;
+        String value = null;
 
-    for (ParseTreeNode child : node.getChildren()) {
-        switch (child.getSymbol()) {
-            case "identifier":
-                if (identifier == null) {
-                    identifier = getLeafValue(child);
-                } else {
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    if (identifier == null) {
+                        identifier = getLeafValue(child);
+                    } else {
+                        value = getLeafValue(child);
+                    }
+                    break;
+                case "comet_literal":
                     value = getLeafValue(child);
-                }
-                break;
-            case "comet_literal":
-                value = getLeafValue(child);
-                break;
-            case "arithExp":
-                value = arithmetic(child, valueTable, scopes);
-                break;
+                    break;
+                case "arithExp":
+                    value = arithmetic(child, valueTable, scopes);
+                    break;
+            }
+        }
+
+        if (identifier != null && value != null) {
+            // Check if the identifier is already declared in the current scope
+            if (!scopes.peek().containsKey(identifier)) {
+                // Create a VariableEntry and set its value
+                VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                // Add the VariableEntry to the valueTable
+                valueTable.put(identifier, entry);
+                // Also add the identifier and value to the current scope
+                scopes.peek().put(identifier, value);
+            } else {
+                throw new IllegalStateException(
+                        "DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
+            }
         }
     }
 
-    if (identifier != null && value != null) {
-        // Check if the identifier is already declared in the current scope
-        if (!scopes.peek().containsKey(identifier)) {
-            // Create a VariableEntry and set its value
-            VariableEntry entry = new VariableEntry(identifier, value, scopes);
-            // Add the VariableEntry to the valueTable
-            valueTable.put(identifier, entry);
-            // Also add the identifier and value to the current scope
-            scopes.peek().put(identifier, value);
-            //printValueTable(valueTable);
-            //System.out.println("Declaration: " + identifier + " : " + value);
-        } else {
-            throw new IllegalStateException(
-                    "DECLARATION ERROR: " + identifier + " has already been declared in the current scope.");
-        }
-    }
-}
     private static String arithmetic(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
             Stack<HashMap<String, String>> scopes) {
         List<String> leaves = getLeaves(node);
@@ -315,8 +327,6 @@ public class Interpreter {
                             valueTable.put(identifier, entry);
                             // Also add the identifier and value to the current scope
                             scopes.peek().put(identifier, value);
-                            //System.out.println("Assignment: " + identifier + " : " + value);
-                            //printValueTable(valueTable);
                             break;
                         }
                     }
@@ -330,8 +340,6 @@ public class Interpreter {
                             valueTable.put(identifier, entry);
                             // Also add the identifier and value to the current scope
                             scopes.peek().put(identifier, value);
-                            //printValueTable(valueTable);
-                            //System.out.println("Assignment: " + identifier + " : " + value);
                             break;
                         }
                     }
@@ -376,51 +384,49 @@ public class Interpreter {
     }
 
     private static void reception(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
-                              Stack<HashMap<String, String>> scopes) {
-    String statement = null;
-    String identifier = null;
-    String value = null;
+            Stack<HashMap<String, String>> scopes) {
+        String statement = null;
+        String identifier = null;
+        String value = null;
 
-    for (ParseTreeNode child : node.getChildren()) {
-        switch (child.getSymbol()) {
-            case "identifier":
-                identifier = getLeafValue(child);
-                if (lookupVariable(identifier, scopes) == null) {
-                    throw new IllegalStateException(
-                            "RECEPTION ERROR: " + identifier + " has not yet been declared.");
-                }
-                break;
-            case "string":
-                statement = getLeafValue(child).replace("\"", "");
-                break;
-        }
-    }
-
-    if (lookupVariable(identifier, scopes) != null) {
-        System.out.print(statement); // Print user prompt
-        value = scanner.nextLine(); // Read user input using the class-level scanner
-
-        if (value.matches("-?\\d+(\\.\\d+)?")) {
-            // Update the value in the current scope
-            for (int i = scopes.size() - 1; i >= 0; i--) {
-                if (scopes.get(i).containsKey(identifier)) {
-                    // Create a VariableEntry and set its value
-                    VariableEntry entry = new VariableEntry(identifier, value, scopes);
-                    // Add the VariableEntry to the valueTable
-                    valueTable.put(identifier, entry);
-                    // Also add the identifier and value to the current scope
-                    scopes.peek().put(identifier, value);
-                    //printValueTable(valueTable);
+        for (ParseTreeNode child : node.getChildren()) {
+            switch (child.getSymbol()) {
+                case "identifier":
+                    identifier = getLeafValue(child);
+                    if (lookupVariable(identifier, scopes) == null) {
+                        throw new IllegalStateException(
+                                "RECEPTION ERROR: " + identifier + " has not yet been declared.");
+                    }
                     break;
-                }
+                case "string":
+                    statement = getLeafValue(child).replace("\"", "");
+                    break;
             }
-        } else {
-            throw new IllegalStateException(
-                    "RECEPTION ERROR: Reception input should be a Comet (integer).");
+        }
+
+        if (lookupVariable(identifier, scopes) != null) {
+            System.out.print(statement); // Print user prompt
+            value = scanner.nextLine(); // Read user input using the class-level scanner
+
+            if (value.matches("-?\\d+(\\.\\d+)?")) {
+                // Update the value in the current scope
+                for (int i = scopes.size() - 1; i >= 0; i--) {
+                    if (scopes.get(i).containsKey(identifier)) {
+                        // Create a VariableEntry and set its value
+                        VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                        // Add the VariableEntry to the valueTable
+                        valueTable.put(identifier, entry);
+                        // Also add the identifier and value to the current scope
+                        scopes.peek().put(identifier, value);
+                        break;
+                    }
+                }
+            } else {
+                throw new IllegalStateException(
+                        "RECEPTION ERROR: Reception input should be a Comet (integer).");
+            }
         }
     }
-}
-
 
     private static Boolean logical(ParseTreeNode node, HashMap<String, VariableEntry> valueTable) {
         Boolean leftValue = null;
@@ -464,28 +470,24 @@ public class Interpreter {
                     if (entry != null) {
                         if (leftValue == null) {
                             leftValue = entry.getValue();
-                            //System.out.println("left identifer: " + leftValue);
                         } else {
                             rightValue = entry.getValue();
-                            //System.out.println("right identifer: " + rightValue);
                         }
                     } else {
-                        throw new IllegalStateException("Identifier '" + identifier + "' not found in the value table.");
+                        throw new IllegalStateException(
+                                "Identifier '" + identifier + "' not found in the value table.");
                     }
                     break;
                 case "comet_literal":
                     String literal = getLeafValue(child);
                     if (leftValue == null) {
                         leftValue = literal;
-                        //System.out.println("left literal: " + leftValue);
                     } else {
                         rightValue = literal;
-                        //System.out.println("right literal: " + rightValue);
                     }
                     break;
                 case "relationalOp":
                     operator = getLeafValue(child);
-                    //System.out.println("operator: " + operator);
                     break;
             }
         }

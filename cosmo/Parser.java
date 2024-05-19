@@ -22,6 +22,7 @@ public class Parser {
     private String[] tokens;
     private HashMap<String, VariableEntry> valueTable = new HashMap<>();
     private static Stack<HashMap<String, String>> scopes = new Stack<>();
+    public static List<Map<String, String>> scopedVariablesList = new ArrayList<>();
 
     public Parser(String[] tokens) {
         this.tokens = tokens;
@@ -53,7 +54,7 @@ public class Parser {
         String[] stk = new String[tokenLength];
         Arrays.fill(stk, ""); // Initialize stk with empty strings
 
-        ParseTreeNode root = new ParseTreeNode("Program " + fileNumber);
+        ParseTreeNode root = new ParseTreeNode("Program");
         // Define an ArrayList to hold data
         List<String[]> dataTable = new ArrayList<>();
 
@@ -149,7 +150,7 @@ public class Parser {
             } else {
                 System.out.println("Reject\n");
                 System.out.println("\n-------------------------------------------------\r\n" + //
-                                        "\n");
+                        "\n");
                 dataTable.add(new String[] { "REJECT", "", "" });
                 out.println("Parse tree cannot be generated for the given input");
             }
@@ -160,7 +161,7 @@ public class Parser {
         // Write data to CSV file
         writeOutputToFile(parserFilePath, dataTable);
         // Write final value table to txt file
-        writeValueTableToFile(valueTableFilePath, valueTable);
+        writeValueTableToFile(valueTableFilePath);
     }
 
     public static String joinWithoutNull(String[] arr) {
@@ -190,24 +191,30 @@ public class Parser {
         }
     }
 
-    public void writeValueTableToFile(String fileName, HashMap<String, VariableEntry> valueTable) {
+    public void writeValueTableToFile(String fileName) {
+        // Try-with-resources to ensure BufferedWriter is closed after usage
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            printValueTable(writer, valueTable);
+            int scopeNumber = 1; // Initialize the scope number
+            for (Map<String, String> scopedVariables : scopedVariablesList) {
+                // Write the scope header
+                writer.write("Scope " + scopeNumber + ":");
+                writer.newLine();
+                // Write each key-value pair in the current scope
+                for (Map.Entry<String, String> entry : scopedVariables.entrySet()) {
+                    writer.write(entry.getKey() + " : " + entry.getValue());
+                    writer.newLine();
+                }
+                writer.newLine(); // Add a blank line after each scope to separate them
+                scopeNumber++; // Increment the scope number
+            }
         } catch (IOException e) {
+            // Print an error message if an IOException occurs
             System.err.println("Error writing value table to file: " + e.getMessage());
         }
+
+        // Clear all the tables after writing the output file
+        scopedVariablesList.clear();
     }
-    
-    public static void printValueTable(BufferedWriter writer, HashMap<String, VariableEntry> valueTable) throws IOException {
-        writer.write("Value Table Contents:");
-        writer.newLine();
-        for (Map.Entry<String, VariableEntry> entry : valueTable.entrySet()) {
-            String identifier = entry.getKey();
-            VariableEntry variableEntry = entry.getValue();
-            writer.write("Identifier: " + identifier + ", VariableEntry: " + variableEntry);
-            writer.newLine();
-        }
-    }    
 
     static ArrayList<String> checkProds(ArrayList<String> tokenList) {
         String action = "REDUCE TO -> ";
