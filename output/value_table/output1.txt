@@ -1,12 +1,7 @@
 Scope 1:
-x : 333
-newResult : 1673
+x : 444
 
 Scope 2:
-x : 222
-newResult : 1118
-
-Scope 3:
 result : 18
 x : 5
 y : 10

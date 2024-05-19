@@ -10,26 +10,6 @@ Orbit ( result <= 100 ) {
     transmission ( "result is less than or equal to 100" ) ; 
     x = reception ( "enter new value for x " ) ;
     transmission ( x ) ;
-    Comet newResult = 0 ;
-    newResult = x * 5 + 10 - 2 ;
-    transmission ( newResult ) ;
-} Propel {
-    Comet x = 200 ;
-    transmission ( result ) ;
-    transmission ( "Result is greater than 100" ) ; 
-    x = x + result ;
-    transmission ( x ) ;
-} ;
-
-Orbit ( result <= 100 ) {
-    Comet x = 100 ;
-    transmission ( result ) ;
-    transmission ( "result is less than or equal to 100" ) ; 
-    x = reception ( "enter new value for x " ) ;
-    transmission ( x ) ;
-    Comet newResult = 0 ;
-    newResult = x * 5 + 10 - 2 ;
-    transmission ( newResult ) ;
 } Propel {
     Comet x = 200 ;
     transmission ( result ) ;

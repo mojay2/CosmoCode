@@ -4,6 +4,7 @@ import cosmo.lexeme.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,7 +47,14 @@ public class Tokenizer {
             System.out.print("\033[H\033[2J");
             System.out.flush();
 
-            String[] tokens = processInput("./input/input" + choice + ".txt",
+            File inputFile = new File("./input/input" + choice + ".txt");
+            if (!inputFile.exists()) {
+                System.err.println("Error: Input file not found.");
+                return; // Exit the method or handle the error accordingly
+            }
+
+            // Process the input file if it exists
+            String[] tokens = processInput(inputFile.getPath(),
                     "./output/tokenizer/output" + choice + ".txt",
                     "./output/symbol_table/output" + choice + ".txt");
             Parser parser = new Parser(tokens);

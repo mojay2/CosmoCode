@@ -315,39 +315,22 @@ public class Interpreter {
 
         if (identifier != null && value != null) {
             // Check if the identifier is declared in any scope
-            if (lookupVariable(identifier, scopes) != null) {
-                // Check if the value is a valid number or a declared variable
-                if (value.matches("-?\\d+(\\.\\d+)?")) {
-                    // Update the variable in the most specific scope
-                    for (int i = scopes.size() - 1; i >= 0; i--) {
-                        if (scopes.get(i).containsKey(identifier)) {
-                            // Create a VariableEntry and set its value
-                            VariableEntry entry = new VariableEntry(identifier, value, scopes);
-                            // Add the VariableEntry to the valueTable
-                            valueTable.put(identifier, entry);
-                            // Also add the identifier and value to the current scope
-                            scopes.peek().put(identifier, value);
-                            break;
-                        }
-                    }
-                } else if (lookupVariable(value, scopes) != null) {
-                    // Update the variable in the most specific scope
-                    for (int i = scopes.size() - 1; i >= 0; i--) {
-                        if (scopes.get(i).containsKey(identifier)) {
-                            // Create a VariableEntry and set its value
-                            VariableEntry entry = new VariableEntry(identifier, value, scopes);
-                            // Add the VariableEntry to the valueTable
-                            valueTable.put(identifier, entry);
-                            // Also add the identifier and value to the current scope
-                            scopes.peek().put(identifier, value);
-                            break;
-                        }
-                    }
-                } else {
-                    throw new IllegalStateException("ASSIGNMENT ERROR: " + value + " has not yet been declared.");
+            boolean found = false;
+            for (int i = scopes.size() - 1; i >= 0; i--) {
+                if (scopes.get(i).containsKey(identifier)) {
+                    // Update the variable in the found scope
+                    scopes.get(i).put(identifier, value);
+                    // Update the valueTable accordingly
+                    VariableEntry entry = new VariableEntry(identifier, value, scopes);
+                    valueTable.put(identifier, entry);
+                    found = true;
+                    break;
                 }
-            } else {
-                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not yet been declared.");
+            }
+
+            // If the identifier is not found in any scope, throw an error
+            if (!found) {
+                throw new IllegalStateException("ASSIGNMENT ERROR: " + identifier + " has not been declared.");
             }
         }
     }
@@ -695,13 +678,14 @@ public class Interpreter {
             }
         }
 
+        enterScope(scopes);
+
         // If condition is true, execute the statements
         while (condition) {
             if (++loopCount > MAX_ITERATIONS) {
                 throw new IllegalStateException("Maximum loop iterations exceeded");
             }
 
-            enterScope(scopes);
             statementProcessor(node, valueTable, scopes);
 
             // Re-evaluate the condition
@@ -712,8 +696,9 @@ public class Interpreter {
                         break;
                 }
             }
-            exitScope(scopes);
         }
+
+        exitScope(scopes);
     }
 
     private static void launchWhirl(ParseTreeNode node, HashMap<String, VariableEntry> valueTable,
