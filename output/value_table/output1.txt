@@ -1,8 +1,6 @@
 Scope 1:
 
 Scope 2:
-result : 18
-x : 45
-y : 10
-z : 3
+var2 : 15
+var1 : 20
 

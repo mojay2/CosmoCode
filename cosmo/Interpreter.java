@@ -544,6 +544,7 @@ public class Interpreter {
                                     switch (exprChild.getSymbol()) {
                                         case "decStmt":
                                             declaration(exprChild, valueTable, scopes);
+                                            System.out.println("REACHED DECLA");
                                             break;
                                         case "assignStmt":
                                             assignment(exprChild, valueTable, scopes);
@@ -551,8 +552,21 @@ public class Interpreter {
                                         case "transmissionStmt":
                                             transmission(exprChild, valueTable, scopes);
                                             break;
-                                        case "receptionStmt":
-                                            reception(exprChild, valueTable, scopes);
+                                        case "orbitStmt1":
+                                            orbit(exprChild, valueTable, scopes);
+                                            break;
+                                        case "orbitStmt2":
+                                            orbitPropel(exprChild, valueTable, scopes);
+                                            break;
+                                        case "orbitStmt3":
+                                            orbitNavigatePropel(exprChild, valueTable, scopes);
+                                            break;
+                                        case "whirlLoop":
+                                            whirl(exprChild, valueTable, scopes);
+                                            System.out.println("REACHED WHIRL LOOP");
+                                            break;
+                                        case "launchWhirlLoop":
+                                            launchWhirl(exprChild, valueTable, scopes);
                                             break;
                                     }
                                 }

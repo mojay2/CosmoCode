@@ -425,13 +425,16 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule expression -> transmission | reception | arithmetic | assignment | declaration
+            // Check for producing rule expression -> transmission | reception | arithmetic
+            // | assignment | declaration
             if (stk[z].equals("receptionStmt") ||
                     stk[z].equals("transmissionStmt") ||
                     (stk[z].equals("arithExp") && !stk[z + 1].equals("arith_plus") && !stk[z + 1].equals("arith_minus")
                             && !stk[z + 1].equals("arith_div") && !stk[z + 1].equals("arith_mult"))
                     ||
-                    stk[z].equals("assignStmt") || stk[z].equals("decStmt")) {
+                    stk[z].equals("assignStmt") || stk[z].equals("decStmt") || stk[z].equals("orbitStmt1")
+                    || stk[z].equals("orbitStmt2") || stk[z].equals("orbitStmt3") || stk[z].equals("whirlLoop")
+                    || stk[z].equals("launchWhirlLoop")) {
                 // Perform reduction for expression
                 stk[z] = "expr";
 
@@ -693,7 +696,8 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule orbit -> orbit ( condition ) { stmt } propel { stmt } ;
+            // Check for producing rule orbit -> orbit ( condition ) { stmt } propel { stmt
+            // } ;
             if (stk[z].equals("orbit_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
@@ -733,7 +737,8 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 5; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule orbit -> orbit ( condition ) { stmt } navigate ( condition ) { stmt } propel { stmt } ;
+            // Check for producing rule orbit -> orbit ( condition ) { stmt } navigate (
+            // condition ) { stmt } propel { stmt } ;
             if (stk[z].equals("orbit_token") &&
                     stk[z + 1].equals("conditionalExp") &&
                     stk[z + 2].equals("stmt") &&
@@ -812,7 +817,8 @@ public class ProductionChecker {
         for (int z = 0; z < stk.length - 4; z++) {
             String original = constructOriginalString(stk, z);
 
-            // Check for producing rule launchWhirl -> launchWhirl { stmt } whirl ( condition ) ; 
+            // Check for producing rule launchWhirl -> launchWhirl { stmt } whirl (
+            // condition ) ;
             if (stk[z].equals("launchwhirl_token") &&
                     stk[z + 1].equals("stmt") &&
                     stk[z + 2].equals("whirl_token") &&

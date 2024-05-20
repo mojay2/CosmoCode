@@ -1,21 +1,22 @@
-Comet x = 5 ;
-Comet y = 10 ;
-Comet z = 3 ;
+Comet var1 = 0 ;
+Comet var2 = 0 ;
 
-Comet result = x + y + z ;
+transmission ( "Welcome to adding till you get the number!" ) ;
+var1 = reception ( "Please enter value 1" ) ;
+var2 = reception ( "Please enter value 2 that is below than value 1" ) ;
 
-Orbit ( result <= 100 ) {
-    Comet x = 100 ;
-    transmission ( result ) ;
-    transmission ( "result is less than or equal to 100" ) ; 
-    x = reception ( "enter new value for x " ) ;
-    transmission ( x ) ;
+Orbit ( var1 < var2 ) {
+  transmission ( "var2 is greater than var1!!!" ) ;
 } Propel {
-    Comet x = 200 ;
-    transmission ( result ) ;
-    transmission ( "Result is greater than 100" ) ; 
-    x = x + result ;
-    transmission ( x ) ;
+  Whirl ( var1 > var2 ) {
+    var2 = var2 + 1 ;
+    transmission ( "Incremented var2!" ) ;
+    transmission ( "var2 is now: " ) ;
+    transmission ( var2 ) ;
+  } ;
 } ;
 
-transmission ( x ) ;
+transmission ( "var1: " ) ;
+transmission ( var1 ) ;
+transmission ( "var2: " ) ;
+transmission ( var2 ) ;
