@@ -114,10 +114,3 @@ Orbit (value > 5) {
     transmission("5 or less");
 };
 ```
-
-## Contributors
-- Jay A. Ambal
-- Lancelot D. Bulan
-- Andrea Louise G. Dayo
-- Natalia Kimberly O. Dee
-- JR Gregg Victor M. Lagman
